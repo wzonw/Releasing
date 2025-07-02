@@ -1,7 +1,5 @@
-// src/login.js
-
 import React from 'react';
-import './login.css'; // Make sure this path matches your folder
+import './login.css';
 
 function Login() {
   return (
@@ -14,14 +12,14 @@ function Login() {
         <h2>OUR MANAGEMENT SYSTEM (OMS)</h2>
       </div>
 
-      {/* Main Card Section */}
+      {/* Main Section */}
       <div className="login-card">
-        {/* Sign In Form */}
+        {/* Login Form */}
         <div className="login-form">
           <h3>SIGN IN</h3>
           <input type="text" placeholder="Username" />
           <input type="password" placeholder="Password" />
-          <button>LOGIN</button>
+          <button className="login-btn">LOGIN</button>
           <button
             type="button"
             className="help-btn"
@@ -34,19 +32,17 @@ function Login() {
         {/* Releasing Window */}
         <div className="releasing-window">
           <h4>RELEASING WINDOW</h4>
-          <div>
-            <p><strong>CATEGORY:</strong> Undergraduate - Graduating Students</p>
-            <p><strong>ACADEMIC YEAR:</strong> 2024 - 2025</p>
-            <p><strong>SEM:</strong> 2nd</p>
-            <p><strong>START DATE:</strong> <span className="highlight">May 19, 2025 1:00 AM</span></p>
-            <p><strong>END DATE:</strong> <span className="highlight">May 25, 2025 11:59 PM</span></p>
-          </div>
+          <p><strong>CATEGORY:</strong> Undergraduate - Graduating Students</p>
+          <p><strong>ACADEMIC YEAR:</strong> 2024 - 2025</p>
+          <p><strong>SEM:</strong> 2nd</p>
+          <p><strong>START DATE:</strong> <span className="highlight">May 19, 2025 1:00 AM</span></p>
+          <p><strong>END DATE:</strong> <span className="highlight">May 25, 2025 11:59 PM</span></p>
         </div>
       </div>
 
       {/* Footer */}
       <p className="login-footer">
-        Today is <strong>Wednesday, July 2, 2025</strong>
+        Today is <strong>Wednesday, July 28, 2025</strong>
       </p>
     </div>
   );
