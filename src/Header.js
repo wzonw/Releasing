@@ -1,6 +1,8 @@
 import React from 'react';
 import './Header.css';
+import { Link } from 'react-router-dom';
 import { MdAccountCircle } from "react-icons/md";
+import Dashboard from './Dashboard';
 
 function Header() {
   return (
@@ -31,10 +33,10 @@ function Header() {
       </div>
       <div className='tabs'> 
         <h2>
-          <a href=' '>Dashboard</a>
+          <Link to="/dashboard">Dashboard</Link>
         </h2>
         <h2>
-          <a href=' '>Requests</a>
+          <Link to="/header">Requests</Link>
         </h2>
       </div>
     </div>

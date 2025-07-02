@@ -1,0 +1,90 @@
+.dashbg{
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    object-fit: cover; /*Maintain ratio*/
+    opacity: 0.1;
+}
+
+.overview-container {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    z-index: 0;
+    margin-top: 25vh;
+}
+.overview-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 750px;
+    display: flex;
+    margin: auto;
+    justify-content: space-between;
+    padding: 2rem;
+    position: relative;
+    justify-self: center;
+}
+.overview-left h2 {
+    margin: 0;
+    font-weight: bold;
+}
+.total-label {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #333;
+}
+.total-count {
+    font-size: 3rem;
+    margin: 0.5rem 0;
+}
+.breakdown p {
+    margin: 0.3rem 0;
+    font-weight: 500;
+}
+.breakdown span {
+    margin-left: 1rem;
+    color: #1d4ed8;
+    font-weight: 600;
+}
+.dropdown {
+    position: relative;
+}
+.dropdown-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #999;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.arrow {
+    margin-left: 0.5rem;
+}
+.dropdown-menu {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 150px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+.dropdown-option {
+    padding: 0.5rem 1rem;
+    width: 100%;
+    border: none;
+    text-align: left;
+    background: transparent;
+    cursor: pointer;
+}
+.dropdown-option:hover:not(:disabled) {
+    background-color: #f0f0f0;
+}
+.dropdown-option:disabled {
+    color: gray;
+    cursor: not-allowed;
+}
