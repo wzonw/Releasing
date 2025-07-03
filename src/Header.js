@@ -2,7 +2,6 @@ import React from 'react';
 import './Header.css';
 import { Link } from 'react-router-dom';
 import { MdAccountCircle } from "react-icons/md";
-import Dashboard from './Dashboard';
 
 function Header() {
   return (

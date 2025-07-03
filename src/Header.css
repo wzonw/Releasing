@@ -125,19 +125,16 @@
     line-height: 0;
     gap: 4rem;
     font-family: 'Kadwa', serif ;
-    background-color:rgba(255, 255, 255, 0);
-    flex-direction: row;
-    margin-top: 2vh;
-    margin-left: 2rem;
+    background-color:rgb(255, 255, 255);
+    padding-top: 2vh;
+    Padding-left: 2rem;
     font-size: 10px;
-    width: 15rem;
     text-shadow: 1px 1px 4px #b0b0b0;
-    border-bottom: 2px solid #071739;
 }
 
 .tabs a {
     text-decoration: none; 
-    color: inherit;        
+    color: inherit;         
 }
 
 

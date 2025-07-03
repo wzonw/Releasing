@@ -1,9 +1,23 @@
+.bgcolor{
+    background-color: #DCDCEC;
+    position: fixed;
+    z-index: -3;
+    height: 100%;
+    width: 100%;
+}
+
 .dashbg{
     position: fixed;
     height: 100%;
     width: 100%;
-    object-fit: cover; /*Maintain ratio*/
+    object-fit: cover ; /*Maintain ratio*/
     opacity: 0.1;
+    z-index: -2;
+}
+
+.dash-bg{
+    position: relative;
+    z-index: 0;
 }
 
 .overview-container {
@@ -11,16 +25,16 @@
     display: flex;
     justify-content: center;
     z-index: 0;
-    margin-top: 25vh;
 }
 .overview-card {
-    background: white;
+    background: aliceblue;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 90%;
     max-width: 750px;
     display: flex;
-    margin: auto;
+    margin:5rem;
+    margin-top: 8cm;
     justify-content: space-between;
     padding: 2rem;
     position: relative;
@@ -87,4 +101,28 @@
 .dropdown-option:disabled {
     color: gray;
     cursor: not-allowed;
+}
+
+.doc-reqs, .course-stat, .sum-table{
+    background-color: rgb(102, 68, 68);
+    border-radius: 16px;
+    align-items: center;
+    padding: 1rem 3rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative; /* para mainagat yung element*/
+    margin: 10vh;
+    height: 30rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.table, .stat, .docs{
+    background-color: #8200005f;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.doc-reqs h1{
+    background-color: #d81d1d;
+    padding-left: 1rem;
+
 }
