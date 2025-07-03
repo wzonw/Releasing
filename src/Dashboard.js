@@ -12,6 +12,7 @@ import Paper from '@mui/material/Paper';
 
 const type = ['Pending', 'Processing', 'Shelf', 'Released', 'Total Requests'];
 const val = [123, 312, 123, 321, 1000];
+const barColors = ['#1d4ed8', '#22c55e', '#f59e42', '#e11d48', '#a21caf'];
 
 function Dashboard() {
   const [filter, setFilter] = useState('All Time');
@@ -83,18 +84,20 @@ const rows = [
             </div>
           </div>
         </div>
-
         <hr></hr>
 
         <div className='doc-reqs'>
           <h1>Request Status</h1>
-          <BarChart className='docs'
-            xAxis={[{ data: type,
-            }]}
-            series={[{
-              data: val, 
-              color:'pink'
-            }]}
+            <BarChart
+            className='docs'
+            xAxis={[{ data: type }]}
+            series={
+              type.map((label, i) => ({
+                data: [val[i]],
+                label,
+                color: barColors[i]
+              }))
+            }
             height={350}
           />
         </div>
