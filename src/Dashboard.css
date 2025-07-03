@@ -16,25 +16,26 @@
 }
 
 .dash-bg{
-    position: relative;
-    z-index: 0;
+    background-color: #1d4ed8;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columns */
+    grid-template-rows: 1fr 1fr;    /* 2 rows */
+    gap: 2rem;                      /* space between cards */
+    width: 100%;
+    margin-top: 9rem;
+    justify-items: stretch;
+    align-items: stretch;
 }
 
-.overview-container {
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    justify-content: center;
-    z-index: 0;
-}
 .overview-card {
+    font-size: small;
     background: aliceblue;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 90%;
+    width: 100%;
+    height: auto;
     max-width: 750px;
     display: flex;
-    margin:5rem;
-    margin-top: 8cm;
     justify-content: space-between;
     padding: 2rem;
     position: relative;
@@ -103,14 +104,13 @@
     cursor: not-allowed;
 }
 
-.doc-reqs, .course-stat, .sum-table{
-    background-color: rgb(102, 68, 68);
+.doc-reqs, .course-stat, .sum-table, .overview-container{
+    background-color: rgb(252, 0, 0);
     border-radius: 16px;
     align-items: center;
     padding: 1rem 3rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     position: relative; /* para mainagat yung element*/
-    margin: 10vh;
     height: 30rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
