@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import Login from './Login';
 import Header from './Header';
+import Request from './Request';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -14,6 +15,7 @@ root.render(
         <Route path="/" element={<Login />} />
         <Route path="/header" element={<Header/>}/>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/req" element={<Request />} />
         <Route path="/login" element={<Login/>}/>
       </Routes>
     </BrowserRouter>

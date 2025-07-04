@@ -35,7 +35,7 @@ function Header() {
           <Link to="/dashboard">Dashboard</Link>
         </h2>
         <h2>
-          <Link to="/header">Requests</Link>
+          <Link to="/req">Requests</Link>
         </h2>
       </div>
     </div>
