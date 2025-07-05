@@ -6,11 +6,11 @@ function Request() {
   const [search, setSearch] = useState({ lastName: '', firstName: '', course: '', docType: '', status: '' });
 
   const data = [
-    { lastName: "MARTIN", firstName: "COCO FYANG", middleName: "ABAD", course: "BAC", docType: "COG", status: "SHELF" },
-    { lastName: "CHENG", firstName: "DOMINGO ANK", middleName: "SMITH", course: "BSIT", docType: "COC", status: "PROCESSING" },
-    { lastName: "YAAMBOT", firstName: "PEAH LALA", middleName: "DANAYA", course: "BS PSYCH", docType: "TOR", status: "RELEASED" },
-    { lastName: "NERY", firstName: "ARTHUR", middleName: "", course: "BSN", docType: "COG", status: "SHELF" },
-    { lastName: "NERY", firstName: "ARTHUR", middleName: "", course: "BSN", docType: "COC", status: "SHELF" }
+    { lastName: "MARTIN", firstName: "COCO FYANG", dof: "07-07-2025", course: "BAC", docType: "COG", status: "SHELF" },
+    { lastName: "CHENG", firstName: "DOMINGO ANK", dof: "07-07-2025", course: "BSIT", docType: "COC", status: "PROCESSING" },
+    { lastName: "YAAMBOT", firstName: "PEAH LALA", dof: "07-07-2025", course: "BS PSYCH", docType: "TOR", status: "RELEASED" },
+    { lastName: "NERY", firstName: "ARTHUR", dof: "07-07-2025", course: "BSN", docType: "COG", status: "SHELF" },
+    { lastName: "NERY", firstName: "ARTHUR", dof: "07-07-2025", course: "BSN", docType: "COC", status: "SHELF" }
   ];
 
   const handleChange = (e) => {
@@ -20,6 +20,7 @@ function Request() {
   const filteredData = data.filter(item =>
     item.lastName.toLowerCase().includes(search.lastName.toLowerCase()) &&
     item.firstName.toLowerCase().includes(search.firstName.toLowerCase()) &&
+    item.course.toLowerCase().includes(search.dof.toLowerCase()) &&
     item.course.toLowerCase().includes(search.course.toLowerCase()) &&
     item.docType.toLowerCase().includes(search.docType.toLowerCase()) &&
     item.status.toLowerCase().includes(search.status.toLowerCase())
@@ -57,7 +58,7 @@ function Request() {
                 <tr>
                     <th>Last Name</th>
                     <th>First Name</th>
-                    <th>Middle Name</th>
+                    <th>Date of Request</th>
                     <th>Course</th>
                     <th>Document Type</th>
                     <th>Status</th>
@@ -68,7 +69,7 @@ function Request() {
                     <tr key={idx}>
                     <td>{item.lastName}</td>
                     <td>{item.firstName}</td>
-                    <td>{item.middleName}</td>
+                    <td>{item.dof}</td>
                     <td>{item.course}</td>
                     <td>{item.docType}</td>
                     <td><span className={`status-tag ${item.status.toLowerCase()}`}>{item.status}</span></td>

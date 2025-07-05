@@ -6,6 +6,7 @@ import Login from './Login';
 import Header from './Header';
 import Request from './Request';
 import reportWebVitals from './reportWebVitals';
+import Upload from './Upload';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -15,6 +16,7 @@ root.render(
         <Route path="/" element={<Login />} />
         <Route path="/header" element={<Header/>}/>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/upload" element={<Upload />} />
         <Route path="/req" element={<Request />} />
         <Route path="/login" element={<Login/>}/>
       </Routes>
