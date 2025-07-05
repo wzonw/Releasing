@@ -6,7 +6,7 @@ import Login from './Login';
 import Header from './Header';
 import Request from './Request';
 import reportWebVitals from './reportWebVitals';
-import Upload from './Upload';
+import Upload  from './Upload';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
