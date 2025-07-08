@@ -1,0 +1,250 @@
+.bgcolor {
+    background-color: #DCDCEC;
+    position: fixed;
+    z-index: -3;
+    height: 100%;
+    width: 100%;
+}
+
+.dashbg {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    opacity: 0.1;
+    z-index: -2;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columns */
+    grid-template-rows: auto auto;  /* 2 rows */
+    gap: 1rem;
+    width: 100%;
+    margin: 2rem auto;
+    justify-items: stretch;
+    align-items: stretch;
+}
+
+.dash-bg {
+    /* background-color: #1d4ed8; */
+    width: 100%;
+    height: 79vh;
+    margin-top: 9rem;
+}
+
+.overview-card {
+    font-size:x-small;
+    background-color: rgb(247, 247, 247);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 10rem;
+    align-content: center;
+    align-self: center;
+    max-width: 750px;
+    display: flex;
+    justify-content: space-between;
+    padding: 2rem;
+    position: relative;
+    justify-self: center;
+}
+
+.overview-container {
+    width: 75%;
+    height: auto;
+}
+
+.overview-left h2 {
+    margin: 0;
+    font-weight: bold;
+}
+
+.total-label {
+    margin-top: 1rem;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.total-count {
+    font-size:xx-large;
+    margin: 0;
+}
+
+.breakdown p {
+    margin: 0.3rem 0;
+    font-weight: 500;
+}
+
+.breakdown span {
+    margin-left: 1rem;
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #999;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.arrow {
+    margin-left: 0.5rem;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 150px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+
+.dropdown-option {
+    padding: 0.5rem 1rem;
+    width: 100%;
+    border: none;
+    text-align: left;
+    background: transparent;
+    cursor: pointer;
+}
+
+.dropdown-option:hover:not(:disabled) {
+    background-color: #f0f0f0;
+}
+
+.dropdown-option:disabled {
+    color: gray;
+    cursor: not-allowed;
+}
+
+.doc-reqs, .course-stat, .sum-table {
+    background-color: rgb(247, 247, 247);
+    border-radius: 10px;
+    padding: 1rem ; 
+    height: 100%;
+    margin-top: 1rem;
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sum-table{
+    width: 83.5%;
+    height: inherit;
+    margin-left: 3px;
+    margin-top: -18rem;
+    font-size: x-small;
+    background-color: #01010100 !important;
+}
+
+.sum-table table {
+    font-size: 0.85rem;   /* Smaller text */
+    width: 100%;
+}
+
+.sum-table th,
+.sum-table td {
+    padding: 0.3rem; /* Less padding in cells */
+    font-size: 0.7rem
+}
+ 
+
+.doc-reqs{
+    /* background-color: #00217b; */
+    width: 100;
+    height: 100%;
+    margin-left: -7rem;
+    min-height: 475px;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-header{
+    background-color: #00217b;
+    color: aliceblue !important; 
+    font-weight: 600 !important;
+    position: sticky;
+    top: 0;
+}
+
+.overview-container {
+    flex-grow: 100;
+    border-radius: 16px;
+    align-items: center;
+    padding: 1rem 3rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+}
+
+.table, .stat, .docs {
+    /* background-color: #8200005f; */
+    border-radius: 10px;
+    height: inherit;
+    
+}
+
+.docs {
+    flex: 1 1 auto;   /* Make the BarChart fill the remaining space */
+    min-height: 0;
+}
+
+.table{
+    width: 100%;
+    padding: 0%;
+    overflow: scroll;
+    scrollbar-color: rgb(182, 154, 0) rgb(0, 0, 144);
+    scrollbar-width: thin;
+    margin: 0%;
+    max-height: 300px;   /* Set your desired height */
+    overflow-y: auto;    /* Vertical scrollbar if needed */
+}
+
+
+.doc-reqs h1 {
+    /* background-color: rgb(0, 0, 0); */
+    color: rgb(0, 0, 144);
+    font-style: italic;
+}
+
+.req-header {
+    /* background-color: violet; */
+    display: flex;
+    justify-content: space-around;
+    gap: 25rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.req-header h1 {
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.course-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #1d4ed8;
+    background-color: #1d4ed8;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 3rem ;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.course-btn:hover {
+    background-color: #1e40af;
+}

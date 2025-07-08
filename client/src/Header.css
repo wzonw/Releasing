@@ -1,0 +1,141 @@
+.Header{
+    display: flex;
+    background-color:rgba(153, 205, 50, 0) ; 
+    height:20vh;
+    width: 100%;
+    top: 0;
+    left: 0;
+    position: fixed;
+    flex-direction: column;
+    z-index: 100000;
+
+}
+
+.dashboard-bg{
+    background: linear-gradient(90deg, #071739 50%, #14409F 100%);
+    height: 13vh;
+    width: 100%;
+    display: flex;
+    position: relative; 
+    top: 0;
+    left: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    /* z-index: 1000; lock sa taas */
+}
+
+.title1{
+    display: flex;
+    justify-self: right;
+    justify-content: center;
+    margin: 25px;
+    /* background-color: bisque; */
+    width:fit-content;
+    flex-direction: column;
+}
+
+.title{
+    display:flex;
+    align-items: center;
+    justify-self: right;
+    font-family: 'Kadwa', serif;
+    font-weight: bold;
+    width: fit-content;
+    /* background-color: aqua; */
+    font-size:2vh;
+    margin: 0rem;
+    margin-left: 5rem;
+    color:aliceblue;
+}
+
+.subTitle{
+    justify-self: left;
+    font-size: small;
+    width: fit-content;
+    /* background-color: blue; */
+    margin: 0rem;
+    margin-left: 5rem;
+    color: aliceblue;
+}
+
+.logo-header{
+    position: absolute;
+    width: 10vh;
+}
+
+.emp{
+    display:flex;
+    flex-direction: row;
+    margin: 1vh;
+    margin-right: 2rem;
+    /* background-color: black; */
+    width: auto;
+    height: auto;
+    color:aliceblue;
+}
+
+.acc-icon{
+    display: inline;
+    margin-top: 1rem;
+    /* background-color: red; */
+    color: aliceblue;
+    width: 3rem;
+    height: 3rem;
+}
+
+.emp-text{
+    align-content: center;
+}
+
+.emp-acc, .desc{
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0%;
+    margin-right: .5rem;
+    /* background-color: brown; */
+
+}
+
+.emp-acc{
+    justify-self: right;
+    /* background-color: brown; */
+    font-weight: bold;
+    font-size: medium;
+}
+
+.desc{
+    justify-self: right;
+    /* background-color: brown; */
+    font-weight: lighter;
+    font-size: small;
+
+}
+
+.bg-image{
+    position: absolute;
+    height: 13vh;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /*Maintain ratio*/
+    opacity: 0.1;
+    object-position: center 65%;
+}
+
+.tabs{
+    display: flex;
+    line-height: 0;
+    gap: 4rem;
+    font-family: 'Kadwa', serif ;
+    background-color:rgb(255, 255, 255);
+    padding-top: 2vh;
+    Padding-left: 2rem;
+    font-size: 10px;
+    text-shadow: 1px 1px 4px #b0b0b0;
+}
+
+.tabs a {
+    text-decoration: none; 
+    color: inherit;         
+}
+
+
+

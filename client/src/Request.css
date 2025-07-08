@@ -1,0 +1,69 @@
+.bodyreq{
+    margin-top: 8rem;
+}
+
+.container {
+  font-family: Arial, sans-serif;
+  margin-top: 10rem ;
+  padding: 1rem;
+  font-size: small;
+}
+
+.filter-bar {
+  display: flex;
+  margin: 0;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #2c5edb;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.filter-bar input,
+.filter-bar select {
+  padding: 0.4rem;
+  border: none;
+  border-radius: 3px;
+  min-width: 160px;
+}
+
+.document-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.document-table th {
+  background: #0a1c48;
+  color: white;
+  padding: 0.8rem;
+  text-align: left;
+}
+
+.document-table td {
+  padding: 0.6rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.status-tag {
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  color: white;
+  text-align: center;
+  display: inline-block;
+  min-width: 80px;
+}
+
+.status-tag.shelf {
+  background-color: #7e9dff;
+}
+
+.status-tag.processing {
+  background-color: #f9a825;
+}
+
+.status-tag.released {
+  background-color: #2e7d32;
+}
