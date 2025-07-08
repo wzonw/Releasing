@@ -26,7 +26,7 @@ function Login() {
       }
     } catch (error) {
       console.error('Error logging in:', error);
-      alert('Something went wrong.');
+      alert('Error Logging In');
     }
   };
 
@@ -47,8 +47,10 @@ function Login() {
         <div className="login-form">
           <h3>SIGN IN</h3>
           <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)}/>
-          <input type="password" placeholder="Password" value={username} onChange={(e) => setPassword(e.target.value)} />
-          <button className="login-btn">LOGIN</button>
+          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <button className="login-btn" onClick={handleLogin}>
+            LOGIN
+          </button>
           <button
             type="button"
             className="help-btn"
