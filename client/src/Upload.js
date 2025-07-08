@@ -19,10 +19,17 @@ function Upload() {
       .catch(err => console.error('Failed to load files:', err));
   }, []);
 
+  const confirmDelete = (filePath) => {
+    setFileToDelete(filePath);
+    setShowConfirm(true);
+  };
+
   const handleDeleteConfirmed = () => {
     const fileName = fileToDelete.split('/').pop();
 
-    fetch(`http://localhost:3001/uploads/${fileName}`, {method: 'DELETE'})
+    fetch(`http://localhost:3001/delete/${fileName}`, {
+      method: 'DELETE',
+    })
       .then((res) => {
         if (!res.ok) throw new Error('Delete failed');
         return res.json();
@@ -34,20 +41,16 @@ function Upload() {
         setShowConfirm(false);
       })
       .catch((err) => {
-        console.error('Fetch Error:', err);
+        console.error('Error deleting from backend:', err);
         alert('Failed to delete file on the server.');
         setShowConfirm(false);
       });
   };
 
+
   const handleCancelDelete = () => {
     setFileToDelete(null);
     setShowConfirm(false);
-  };
-
-  const confirmDelete = (filePath) => {
-    setFileToDelete(filePath);
-    setShowConfirm(true);
   };
 
   const handleFileUpload = async (e) => {
