@@ -8,6 +8,7 @@ import Request from './Request';
 import reportWebVitals from './reportWebVitals';
 import Upload  from './Upload';
 import App from './App';
+import Monitor from './Monitor';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -20,6 +21,7 @@ root.render(
         <Route path="/upload" element={<Upload />} />
         <Route path="/req" element={<Request />} />
         <Route path="/login" element={<Login/>}/>
+        <Route path="/monitor" element={<Monitor/>}/>
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
