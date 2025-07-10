@@ -47,10 +47,32 @@
 
 .monitor-body{
     flex-direction: column;
-    background-color: pink;
+    overflow-x: hidden;
 }
 
 .monitor-container{
-    background-color: burlywood;
+    background-color: rgb(234, 234, 234);
+    border-bottom: 2px solid black;
+    border-radius: 0 0 10px 10px;
+    overflow-y: hidden;
+}
+.bodyreq{
+    margin-top: 8rem;
+}
 
+.moncontainer {
+  font-family: Arial, sans-serif;
+  padding: 1rem;
+  font-size: small;
+}
+
+.filter-mon {
+  display: flex;
+  margin: 0;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #2c5edb;
+  padding: 1rem;
+  border-radius: 5px;
 }
