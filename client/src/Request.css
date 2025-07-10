@@ -69,10 +69,10 @@
 }
 
 .status-tag.claimed {
-    background-color: #3b82f6; /* Tailwind blue-500 */
+    background-color: #3b82f6; 
 }
 
-/* Clickable row style */
+
 .table-row-clickable {
     cursor: pointer;
 }
@@ -85,9 +85,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.6);
-    /* Using grid for robust centering of the modal content within the overlay */
-    display: grid; /* Changed to grid */
-    place-items: center; /* Centers both horizontally and vertically */
+    display: grid; 
     z-index: 9999; /* Increased z-index to ensure it's on top */
     backdrop-filter: blur(4px); /* Optional: adds a blur effect to the background */
     /* Add padding to the overlay itself to ensure space around the modal on smaller screens */

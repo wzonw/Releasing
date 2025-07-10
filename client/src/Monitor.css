@@ -4,6 +4,7 @@
     height: 13vh;
     display: flex;
     align-items: center;
+    position: relative;
 }
 
 .bg-mon{
@@ -20,8 +21,9 @@
     object-fit: cover;
     mix-blend-mode: overlay;
     opacity: 0.3;
-    z-index: 0;
+    z-index: 100;
     object-position: center 65%;
+    /* outline: 1px solid red; TIP!!111!!! see what's overflowing */
 }
 
 .mon-title{
@@ -47,14 +49,13 @@
 
 .monitor-body{
     flex-direction: column;
-    overflow-x: hidden;
+    
 }
 
 .monitor-container{
     background-color: rgb(234, 234, 234);
     border-bottom: 2px solid black;
     border-radius: 0 0 10px 10px;
-    overflow-y: hidden;
 }
 .bodyreq{
     margin-top: 8rem;
@@ -64,6 +65,7 @@
   font-family: Arial, sans-serif;
   padding: 1rem;
   font-size: small;
+  
 }
 
 .filter-mon {

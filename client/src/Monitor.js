@@ -1,6 +1,5 @@
 import './Monitor.css';
 import React, { useState } from 'react';
-import './Request.css';
 
 function Monitor() {
   const [search, setSearch] = useState({ lastName: '', firstName: '', dof: '', course: '', docType: '', status: '' });
