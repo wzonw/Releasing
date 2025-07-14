@@ -1,9 +1,22 @@
-import React from 'react';
+import { React, useState } from 'react';
 import './Header.css';
-import { Link } from 'react-router-dom';
-import { MdAccountCircle } from "react-icons/md";
+import { Link, useNavigate } from 'react-router-dom';
+import { MdAccountCircle, MdLogin } from "react-icons/md";
 
 function Header() {
+  const [showMenu, setShowMenu] = useState(false);
+  const navigate = useNavigate();
+
+  const toggleMenu = () => {
+    setShowMenu(prev => !prev);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/login");
+    // setShowMenu(false);
+
+  };
   return (
     <div className='Header'>
       <div className='dashboard-bg'>
@@ -17,18 +30,29 @@ function Header() {
               Pamantasan ng Lungsod ng Maynila
             </p>
         </div>
-        <div className='emp'>
-          <div className='emp-text'>
-            <h1 className='emp-acc'>
-              Employee Name
-            </h1>
-            <p className='desc'>
-              Clerk-in-Charge
-            </p>
+          <div className='emp'>
+            <div className='emp-text'>
+              <h1 className='emp-acc'>
+                Employee Name
+              </h1>
+              <p className='desc'>
+                Clerk-in-Charge
+              </p>
+            </div>
+            <div className='account-dropdown'>
+              <button className='but' onClick={toggleMenu}>
+              <MdAccountCircle className='acc-icon'/>
+              </button>
+              {showMenu && (
+                  <div className='dropdown-menu'>
+                    <button onClick={handleLogout} className='logout-btn'>
+                      <MdLogin className='logout-icon'/>
+                      Logout
+                    </button>
+                  </div>
+                )}
+            </div>
           </div>
-          <MdAccountCircle className='acc-icon'/>
-        </div>
-
       </div>
       <div className='tabs'> 
         <h2>
