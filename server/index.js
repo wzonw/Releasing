@@ -3,7 +3,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const deletePath = path.join(__dirname, 'public/annex');
+// const deletePath = path.join(__dirname, 'public/annex');
 const pool = require('./db');
 require('dotenv').config();
 const app = express();
@@ -58,6 +58,16 @@ app.get('/testdb', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Database connection failed' });
+  }
+});
+
+app.get('/api/requests', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM outgoing.requests ORDER BY datesubmitted DESC');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching requests:', err.message);
+    res.status(500).send('Server error');
   }
 });
 
