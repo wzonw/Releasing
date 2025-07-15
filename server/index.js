@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const deletePath = path.join(__dirname, 'public/annex');
 const pool = require('./db');
+require('dotenv').config();
 const app = express();
 const PORT = 3001;
 const UPLOADS_DIR = path.join(__dirname, 'public', 'annex');

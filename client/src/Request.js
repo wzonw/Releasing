@@ -17,7 +17,7 @@ function Request() {
       dof: "07-07-2025",
       course: "BAC",
       docType: "COG",
-      status: "SHELF",
+      status: "READY",
       studentNumber: "2020-001",
       yearStarted: "2020",
       yearEnded: "2024",
@@ -59,7 +59,7 @@ function Request() {
       dof: "07-07-2025",
       course: "BS PSYCH",
       docType: "TOR",
-      status: "RELEASED",
+      status: "CLAIMED",
       studentNumber: "2020-003",
       yearStarted: "2020",
       yearEnded: "2024",
@@ -80,7 +80,7 @@ function Request() {
       dof: "07-07-2025",
       course: "BSN",
       docType: "COG",
-      status: "SHELF",
+      status: "READY",
       studentNumber: "2020-004",
       yearStarted: "2020",
       yearEnded: "2024",
@@ -101,7 +101,7 @@ function Request() {
       dof: "07-07-2025",
       course: "BSN",
       docType: "COC",
-      status: "SHELF",
+      status: "READY",
       studentNumber: "2020-005",
       yearStarted: "2020",
       yearEnded: "2024",
@@ -162,7 +162,7 @@ function Request() {
             <input type="text" placeholder="Select Last Name" name="lastName" value={search.lastName} onChange={handleChange} />
             <input type="text" placeholder="Select First Name" name="firstName" value={search.firstName} onChange={handleChange} />
             <select name="dof" onChange={handleChange} value={search.dof}>
-              <option value="">Select Date of Request</option>
+              <option value="">Select Date of Request</option> {/*  //make improptu */}
               <option value="07-07-2025">07-07-2025</option>
             </select>
             <select name="course" onChange={handleChange} value={search.course}>
@@ -180,9 +180,8 @@ function Request() {
             </select>
             <select name="status" onChange={handleChange} value={search.status}>
               <option value="">Select Status</option>
-              <option value="SHELF">SHELF</option>
+              <option value="READY">READY</option>
               <option value="PROCESSING">PROCESSING</option>
-              <option value="RELEASED">RELEASED</option>
               <option value="CLAIMED">CLAIMED</option>
             </select>
           </div>
@@ -305,9 +304,8 @@ function Request() {
                   onChange={handleStatusChange}
                   className="status-dropdown-new"
                 >
-                  <option value="SHELF">SHELF</option>
+                  <option value="READY">READY</option>
                   <option value="PROCESSING">PROCESSING</option>
-                  <option value="RELEASED">RELEASED</option>
                   <option value="CLAIMED">CLAIMED</option>
                 </select>
               )}
