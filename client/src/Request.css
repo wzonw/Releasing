@@ -1,10 +1,10 @@
 .bodyreq{
-    margin-top: 8rem;
+    margin-top: 0rem;
 }
 
 .container {
   font-family: Arial, sans-serif;
-  margin-top: 10rem ;
+  margin-top: 5rem;
   padding: 1rem;
   font-size: small;
 }
@@ -57,7 +57,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 15px;
   gap: 12px;
 }
 

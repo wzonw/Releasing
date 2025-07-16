@@ -52,12 +52,12 @@ function Request() {
   };
 
   const filteredData = requests.filter((req) =>
-    (req.lastName?.toLowerCase() ?? '').includes(search.lastName.toLowerCase()) &&
-    (req.firstName?.toLowerCase() ?? '').includes(search.firstName.toLowerCase()) &&
-    (req.dof?.toLowerCase() ?? '').includes(search.dof.toLowerCase()) &&
-    (req.course?.toLowerCase() ?? '').includes(search.course.toLowerCase()) &&
-    (req.docType?.toLowerCase() ?? '').includes(search.docType.toLowerCase()) &&
-    (req.status?.toLowerCase() ?? '').includes(search.status.toLowerCase())
+    (req.lastname?.toLowerCase() ?? '').includes(search.lastName.toLowerCase()) &&
+    (req.firstname?.toLowerCase() ?? '').includes(search.firstName.toLowerCase()) &&
+    (req.datesubmitted?.toLowerCase() ?? '').includes(search.dof.toLowerCase()) &&
+    (req.degreeprogram?.toLowerCase() ?? '').includes(search.course.toLowerCase()) &&
+    (req.documenttype?.toLowerCase() ?? '').includes(search.docType.toLowerCase()) &&
+    (req.shelf?.toLowerCase() ?? '').includes(search.status.toLowerCase())
   );
 
 
@@ -84,7 +84,7 @@ function Request() {
     // setIsModalOpen(false); // Do not close modal after status update as per new UI
   };
 
-  const itemsPerPage = 8;
+  const itemsPerPage = 7;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, endIndex);
@@ -96,16 +96,12 @@ function Request() {
       <div className='container'>
         <div className='body'>
           <div className="filter-bar">
-            <input type="text" placeholder="Select Last Name" name="lastName" value={search.lastName} onChange={handleChange} />
-            <input type="text" placeholder="Select First Name" name="firstName" value={search.firstName} onChange={handleChange} />
-            <select name="dof" onChange={handleChange} value={search.dof}>
-              <option value="">Select Date of Request</option> {/*  //make improptu */}
-              <option value="07-07-2025">07-07-2025</option>
-            </select>
-            <select name="course" onChange={handleChange} value={search.course}>
-              <option value="">Select Course</option>
-            </select>
-            <select name="docType" onChange={handleChange} value={search.docType}>
+            <input type="text" placeholder="Select Last Name" name="lastName" value={requests.lastname} onChange={handleChange} />
+            <input type="text" placeholder="Select First Name" name="firstName" value={requests.firstname} onChange={handleChange} />
+            <input type="text" placeholder="YYYY/MM/DD" name="dof" onChange={handleChange} value={search.datesubmitted}></input>
+            <input type= "text" placeholder="Search Course/Degree" name="course" onChange={handleChange} value={search.degreeprogram}>
+            </input>
+            <select name="docType" onChange={handleChange} value={search.documenttype}>
               <option value="">Select Document Type</option>
             </select>
             <select name="status" onChange={handleChange} value={search.status}>
@@ -172,26 +168,26 @@ function Request() {
               <span className="request-information-text">Request Information</span>
               <div className="modal-header-right">
                 <span className={`status-tag ${selectedRequest.status.toLowerCase()}`}>{selectedRequest.status}</span>
-                <span className="reference-number">[{selectedRequest.referenceNumber}]</span>
+                <span className="reference-number">[{selectedRequest.formrequestid}]</span>
               </div>
             </div>
 
             <div className="student-info-section">
               <div className="student-name-number">
-                <span className="student-name">{selectedRequest.lastName}, {selectedRequest.firstName}</span>
-                <span className="student-number">Student Number: {selectedRequest.studentNumber}</span>
+                <span className="student-name">{selectedRequest.lastname}, {selectedRequest.firstname}</span>
+                <span className="student-number">Student Number: {selectedRequest.studentnumber}</span>
               </div>
-              <span className="receipt-number">[Receipt Number: {selectedRequest.receiptNumber}]</span>
+              <span className="receipt-number">[Receipt Number: {selectedRequest.ornumber}]</span>
             </div>
 
             <div className="form-grid">
               <div className="form-field">
                 <label>Course:</label>
-                <input type="text" value={selectedRequest.course} readOnly className="modal-input" />
+                <input type="text" value={selectedRequest.degreeprogram} readOnly className="modal-input" />
               </div>
               <div className="form-field">
                 <label>Year Started:</label>
-                <input type="text" value={selectedRequest.yearStarted} readOnly className="modal-input" />
+                <input type="text" value={selectedRequest.ayadmitted} readOnly className="modal-input" />
               </div>
               <div className="form-field">
                 <label>Year Ended:</label>
@@ -228,11 +224,10 @@ function Request() {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedRequest.documentRequests.map((doc, index) => (
+                    {(selectedRequest.documentRequests || []).map((doc, index) => (
                       <tr key={index}>
-                        <td>{doc.docType}</td>
-                        <td>{doc.qty}</td>
-                        <td>{doc.amount}</td>
+                        <td>{doc.documenttype}</td>
+                        <td>{doc.totalamount}</td>
                         <td>{doc.purpose}</td>
                       </tr>
                     ))}
