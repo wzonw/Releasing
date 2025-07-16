@@ -9,22 +9,17 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const type = ['Pending', 'Processing', 'Shelf', 'Released', 'Total Requests'];
 const val = [123, 312, 123, 321, 1000];
 const barColors = ['#1d4ed8', '#22c55e', '#f59e42', '#e11d48', '#a21caf'];
 
 function Dashboard() {
-  const [filter, setFilter] = useState('All Time');
-  const [showDropdown, setShowDropdown] = useState(false);
   const [stackedMode, setStackedMode] = useState(false);
-
-  const filters = ['All Time', 'Last Week', 'Last Month', 'Last Year'];
-
-  const handleSelect = (option) => {
-    setFilter(option);
-    setShowDropdown(false);
-  };
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   function createData(name, Undergraduates, Graduates, Total) {
     return { name, Undergraduates, Graduates, Total };
@@ -46,7 +41,6 @@ function Dashboard() {
     createData('Cupcake', 305, 37, 342),
   ];
 
-  // Data for stacked chart
   const collegeLabels = ['CASBE', 'CHASS', 'CS', 'CISTM', 'CN', 'LAW', 'CET', 'BSA', 'CPT', 'CED', 'SOG', 'CBA'];
   const requestSubmitted = [40, 70, 50, 40, 90, 60, 40, 70, 80, 60, 50, 45];
   const documentsReleased = [30, 60, 20, 30, 60, 40, 20, 60, 100, 80, 60, 55];
@@ -55,10 +49,12 @@ function Dashboard() {
   return (
     <div className=" ">
       <div className='bgcolor'></div>
+      {/* Visually hiding fallback alt text */}
       <img
         src="/images/PLM.jpg"
-        alt="Pamantasan ng Lungsod ng Maynila university logo"
+        alt=""
         className='dashbg'
+        aria-hidden="true"
       />
       <div className='dash-bg'>
         <Header />
@@ -77,24 +73,17 @@ function Dashboard() {
               </div>
 
               <div className="overview-right">
-                <div className="dropdown">
-                  <button className="dropdown-button" onClick={() => setShowDropdown(!showDropdown)}>
-                    {filter} <span className="arrow">▾</span>
-                  </button>
-                  {showDropdown && (
-                    <div className="dropdown-menu">
-                      {filters.map((option) => (
-                        <button
-                          key={option}
-                          className="dropdown-option"
-                          onClick={() => handleSelect(option)}
-                          disabled={option === 'Last Year'}
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                <div className="dropdown-button">
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DatePicker
+                      label="Select Date"
+                      value={selectedDate}
+                      onChange={(newDate) => setSelectedDate(newDate)}
+                      minDate={new Date('2024-01-01')}
+                      maxDate={new Date('2025-12-31')}
+                      slotProps={{ textField: { size: 'small' } }}
+                    />
+                  </LocalizationProvider>
                 </div>
               </div>
             </div>
