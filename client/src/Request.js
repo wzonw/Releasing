@@ -62,6 +62,7 @@ function Request() {
 
 
   const handleRowClick = (requests) => {
+    console.log('Selected request:', requests);
     setSelectedRequest(requests);
     setIsModalOpen(true);
     setShowStatusDropdown(false); // Hide dropdown when opening modal
@@ -207,7 +208,7 @@ function Request() {
               </div>
               <div className="form-field full-width">
                 <label>Date of Request:</label>
-                <input type="text" value={selectedRequest.dof} readOnly className="modal-input" />
+                <input type="text" value={selectedRequest.datesubmitted} readOnly className="modal-input" />
               </div>
             </div>
 
@@ -224,19 +225,16 @@ function Request() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(selectedRequest.documentRequests || []).map((doc, index) => (
-                      <tr key={index}>
-                        <td>{doc.documenttype}</td>
-                        <td>{doc.totalamount}</td>
-                        <td>{doc.purpose}</td>
-                      </tr>
-                    ))}
+                      <td>{selectedRequest.documenttype}</td>
+                      <td>{selectedRequest.quantity}</td>
+                      <td>{selectedRequest.totalamount}</td>
+                      <td>{selectedRequest.purpose}</td>
                   </tbody>
                 </table>
               </div>
               <div className="total-amount-section">
                 <span>Total Amount:</span>
-                <input type="text" value={selectedRequest.totalAmount} readOnly className="modal-input total-amount-input" />
+                <input type="text" value={selectedRequest.totalamount} readOnly className="modal-input total-amount-input" />
               </div>
             </div>
 
