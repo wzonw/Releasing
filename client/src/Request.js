@@ -1,137 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Request.css';
-import Header from './Header'; // Assuming Header component exists
+import Header from './Header';
+import axios from 'axios';
 
 function Request() {
   const [search, setSearch] = useState({ lastName: '', firstName: '', dof: '', course: '', docType: '', status: '' });
+  const [requests, setRequests] = useState([]);
+  const [shelf, setShelfStatus] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false); // State to control status dropdown visibility
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  //Fetch all data from backend outgoing request table 
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/requests'); // Change if hosted elsewhere
+        setRequests(response.data);
+        console.log('Fetched requests:', response.data)
+      } catch (error) {
+        console.error('Error fetching requests:', error);
+      }
+    };
 
-  // Updated 'requests' state with new fields and more detailed document requests
-  const [requests, setRequests] = useState([
-    {
-      id: 1,
-      lastName: "MARTIN",
-      firstName: "COCO FYANG",
-      dof: "07-07-2025",
-      course: "BAC",
-      docType: "COG",
-      status: "READY",
-      studentNumber: "2020-001",
-      yearStarted: "2020",
-      yearEnded: "2024",
-      phoneNumber: "09171234567",
-      landline: "81234567",
-      email: "coco.martin@example.com",
-      referenceNumber: "REF001",
-      receiptNumber: "REC001",
-      documentRequests: [
-        { docType: "COG", qty: 1, amount: "P300.00", purpose: "Job Application" }
-      ],
-      totalAmount: "P300.00"
-    },
-    {
-      id: 2,
-      lastName: "CHENG",
-      firstName: "DOMINGO ANK",
-      dof: "07-07-2025",
-      course: "BSIT",
-      docType: "COC",
-      status: "PROCESSING",
-      studentNumber: "2020-002",
-      yearStarted: "2020",
-      yearEnded: "2024",
-      phoneNumber: "09172345678",
-      landline: "82345678",
-      email: "domingo.cheng@example.com",
-      referenceNumber: "REF002",
-      receiptNumber: "REC002",
-      documentRequests: [
-        { docType: "COC", qty: 1, amount: "P250.00", purpose: "Further Studies" }
-      ],
-      totalAmount: "P250.00"
-    },
-    {
-      id: 3,
-      lastName: "YAAMBOT",
-      firstName: "PEAH LALA",
-      dof: "07-07-2025",
-      course: "BS PSYCH",
-      docType: "TOR",
-      status: "CLAIMED",
-      studentNumber: "2020-003",
-      yearStarted: "2020",
-      yearEnded: "2024",
-      phoneNumber: "09173456789",
-      landline: "83456789",
-      email: "peah.yaambot@example.com",
-      referenceNumber: "REF003",
-      receiptNumber: "REC003",
-      documentRequests: [
-        { docType: "TOR", qty: 1, amount: "P500.00", purpose: "Visa Application" }
-      ],
-      totalAmount: "P500.00"
-    },
-    {
-      id: 4,
-      lastName: "NERY",
-      firstName: "ARTHUR",
-      dof: "07-07-2025",
-      course: "BSN",
-      docType: "COG",
-      status: "READY",
-      studentNumber: "2020-004",
-      yearStarted: "2020",
-      yearEnded: "2024",
-      phoneNumber: "09174567890",
-      landline: "84567890",
-      email: "arthur.nery@example.com",
-      referenceNumber: "REF004",
-      receiptNumber: "REC004",
-      documentRequests: [
-        { docType: "COG", qty: 1, amount: "P300.00", purpose: "Personal Record" }
-      ],
-      totalAmount: "P300.00"
-    },
-    {
-      id: 5,
-      lastName: "NERY",
-      firstName: "ARTHUR",
-      dof: "07-07-2025",
-      course: "BSN",
-      docType: "COC",
-      status: "READY",
-      studentNumber: "2020-005",
-      yearStarted: "2020",
-      yearEnded: "2024",
-      phoneNumber: "09175678901",
-      landline: "85678901",
-      email: "arthur.nery2@example.com",
-      referenceNumber: "REF005",
-      receiptNumber: "REC005",
-      documentRequests: [
-        { docType: "COC", qty: 1, amount: "P250.00", purpose: "Employment" }
-      ],
-      totalAmount: "P250.00"
+    fetchRequests();
+  }, []);
+
+  //Fetch from shelf status but only the shelf status
+  useEffect(() => {
+  const fetchShelfStatus = async () => {
+    try {
+      const res = await axios.get('http://localhost:3001/api/shelfstatus');
+      // console.log("SHELF STATUS RAW:", res.data);
+      const statusMap = {};
+      res.data.forEach(row => {
+        statusMap[row.request_id] = row.shelfstatus;
+      });
+      setShelfStatus(statusMap);
+      console.log('Fetched shelf status:', res.data);
+    } catch (error) {
+      console.error('Error fetching shelf status:', error);
     }
-  ]);
+  };
+
+  fetchShelfStatus();
+}, []);
 
   const handleChange = (e) => {
     setSearch({ ...search, [e.target.name]: e.target.value });
   };
 
-  const filteredData = requests.filter(item =>
-    item.lastName.toLowerCase().includes(search.lastName.toLowerCase()) &&
-    item.firstName.toLowerCase().includes(search.firstName.toLowerCase()) &&
-    item.dof.toLowerCase().includes(search.dof.toLowerCase()) &&
-    item.course.toLowerCase().includes(search.course.toLowerCase()) &&
-    item.docType.toLowerCase().includes(search.docType.toLowerCase()) &&
-    item.status.toLowerCase().includes(search.status.toLowerCase())
+  const filteredData = requests.filter((req) =>
+    (req.lastName?.toLowerCase() ?? '').includes(search.lastName.toLowerCase()) &&
+    (req.firstName?.toLowerCase() ?? '').includes(search.firstName.toLowerCase()) &&
+    (req.dof?.toLowerCase() ?? '').includes(search.dof.toLowerCase()) &&
+    (req.course?.toLowerCase() ?? '').includes(search.course.toLowerCase()) &&
+    (req.docType?.toLowerCase() ?? '').includes(search.docType.toLowerCase()) &&
+    (req.status?.toLowerCase() ?? '').includes(search.status.toLowerCase())
   );
 
-  const handleRowClick = (request) => {
-    setSelectedRequest(request);
+
+  const handleRowClick = (requests) => {
+    setSelectedRequest(requests);
     setIsModalOpen(true);
     setShowStatusDropdown(false); // Hide dropdown when opening modal
   };
@@ -149,13 +80,19 @@ function Request() {
       )
     );
     setSelectedRequest(prev => ({ ...prev, status: newStatus }));
-    setShowStatusDropdown(false); // Hide dropdown after status update
+    setShowStatusDropdown(false); 
     // setIsModalOpen(false); // Do not close modal after status update as per new UI
   };
 
+  const itemsPerPage = 8;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
+
   return (
     <div className="bodyreq">
-      <div><Header /></div>
+      <div><Header/></div>
       <div className='container'>
         <div className='body'>
           <div className="filter-bar">
@@ -167,16 +104,9 @@ function Request() {
             </select>
             <select name="course" onChange={handleChange} value={search.course}>
               <option value="">Select Course</option>
-              <option value="BAC">BAC</option>
-              <option value="BSIT">BSIT</option>
-              <option value="BS PSYCH">BS PSYCH</option>
-              <option value="BSN">BSN</option>
             </select>
             <select name="docType" onChange={handleChange} value={search.docType}>
               <option value="">Select Document Type</option>
-              <option value="COG">COG</option>
-              <option value="COC">COC</option>
-              <option value="TOR">TOR</option>
             </select>
             <select name="status" onChange={handleChange} value={search.status}>
               <option value="">Select Status</option>
@@ -188,8 +118,8 @@ function Request() {
           <table className="document-table">
             <thead>
               <tr>
-                <th>Last Name</th>
-                <th>First Name</th>
+                <th className='name'>Last Name</th>
+                <th className='name'>First Name</th>
                 <th>Date of Request</th>
                 <th>Course</th>
                 <th>Document Type</th>
@@ -197,18 +127,40 @@ function Request() {
               </tr>
             </thead>
             <tbody>
-              {filteredData.map((item) => (
-                <tr key={item.id} onClick={() => handleRowClick(item)} className="table-row-clickable">
-                  <td>{item.lastName}</td>
-                  <td>{item.firstName}</td>
-                  <td>{item.dof}</td>
-                  <td>{item.course}</td>
-                  <td>{item.docType}</td>
-                  <td><span className={`status-tag ${item.status.toLowerCase()}`}>{item.status}</span></td>
+              {paginatedData.map((requests) => (
+                <tr key={requests.id} onClick={() => handleRowClick(requests)} className="table-row-clickable">
+                  <td className='Sname'>{requests.lastname}</td>
+                  <td className='Sname'>{requests.firstname}</td>
+                  <td>{requests.datesubmitted}</td>
+                  <td>{requests.degreeprogram}</td>
+                  <td>{requests.documenttype}</td>
+                    <td><span className={`status-tag ${shelf[requests.id]?.toLowerCase()}`}>{shelf[requests.id]}</span></td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <div className="pagination">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+
+          <span>Page {currentPage} of {Math.ceil(filteredData.length / itemsPerPage)}</span>
+
+          <button
+            onClick={() =>
+              setCurrentPage(prev =>
+                Math.min(prev + 1, Math.ceil(filteredData.length / itemsPerPage))
+              )
+            }
+            disabled={currentPage >= Math.ceil(filteredData.length / itemsPerPage)}
+          >
+            Next
+          </button>
+        </div>
+
         </div>
       </div>
 

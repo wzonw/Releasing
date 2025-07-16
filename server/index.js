@@ -51,7 +51,7 @@ const storage = multer.diskStorage({
 });
 
 //Database connection
-app.get('/testdb', async (req, res) => {
+app.get('/server/test', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()'); //time test if working siya
     res.json(result.rows[0]);
@@ -61,12 +61,24 @@ app.get('/testdb', async (req, res) => {
   }
 });
 
+//fetch from request table
 app.get('/api/requests', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM outgoing.requests ORDER BY datesubmitted DESC');
+    const result = await pool.query('SELECT * FROM outgoing.requests ORDER BY datesubmitted DESC'); //kinuha lahat ng column/fieldname
     res.json(result.rows);
   } catch (err) {
     console.error('Error fetching requests:', err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+//fetch from shelfstatus table
+app.get('/api/shelfstatus', async (req, res) => {
+  try {
+    const result1 = await pool.query('SELECT request_id, shelfstatus FROM outgoing.shelfstatus'); //shelfstatus lang kinuha dito
+    res.json(result1.rows);
+  } catch (err) {
+    console.error('Error fetching shelfstatus:', err.message);
     res.status(500).send('Server error');
   }
 });
