@@ -6,37 +6,40 @@
   align-items: center;
   justify-content: center;
   font-family: sans-serif;
-  padding: 2rem 1rem;
+  padding: 1rem 1rem; 
   border-top: 16px solid #1e3a8a;
   border-bottom: 16px solid #1e3a8a;
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
+  margin-top: -2rem; 
 }
 
+
 .login-logo {
-  width: 48px;
-  height: 48px;
-  margin-bottom: 0.5rem;
+  width: 64px;      
+  height: 64px;   
+  margin-bottom: 1rem; 
 }
 
 .login-header h1 {
-  font-size: 0.9rem;
+  font-size: 1rem;       
   font-weight: bold;
+  margin: 0.25rem 0;     
 }
 
 .login-header p {
-  font-size: 0.75rem;
-  margin: 0.25rem 0;
+  font-size: 0.875rem;   
+  margin: 0.25rem 0;     
 }
 
 .login-header h2 {
-  font-size: 1rem;
+  font-size: 1.125rem;   
   font-weight: bold;
   color: #1e40af;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;   
   letter-spacing: 0.03em;
 }
 
