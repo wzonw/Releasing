@@ -20,19 +20,19 @@
     const [currentPage, setCurrentPage] = useState(1);
 
     // Fetch all data from backend with search filters
+    const fetchRequests = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/requests', { params: search });
+        setRequests(response.data);
+        console.log('Fetched filtered requests:', response.data);
+      } catch (error) {
+        console.error('Error fetching requests:', error);
+      }
+    };
     useEffect(() => {
-      const fetchRequests = async () => {
-        try {
-          const response = await axios.get('http://localhost:3001/api/requests', { params: search });
-          setRequests(response.data);
-          console.log('Fetched filtered requests:', response.data);
-        } catch (error) {
-          console.error('Error fetching requests:', error);
-        }
-      };
-
       fetchRequests();
     }, [search]);
+
 
     // Fetch shelf status = NOT IN USE ANYMORE
     // useEffect(() => {
@@ -77,16 +77,31 @@
       setSelectedRequest(null);
     };
 
-    const handleStatusChange = (e) => {
-      const newStatus = e.target.value;
-      setRequests(prevRequests =>
-        prevRequests.map(req =>
-          req.id === selectedRequest.id ? { ...req, status: newStatus } : req
-        )
-      );
-      setSelectedRequest(prev => ({ ...prev, status: newStatus }));
-      setShowStatusDropdown(false);
+
+    const handleStatusChange = async (requestId, newStatus) => {
+      try {
+        const updatedby = "Trisha Ann"; // Replace this with actual logged in user if needed
+
+        const response = await fetch("http://localhost:3001/api/update-status", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            request_id: requestId,
+            shelfstatus: newStatus,
+            updatedby: updatedby
+          })
+        });
+
+        if (!response.ok) throw new Error("Update failed");
+
+        alert("Status updated successfully!");
+        fetchRequests(); // <-- Make sure this function is defined
+      } catch (err) {
+        console.error("Error updating status:", err);
+        alert("Error updating status.");
+      }
     };
+
 
     const itemsPerPage = 7;
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -245,7 +260,10 @@
                   EDIT STATUS
                 </button>
                 {showStatusDropdown && (
-                  <select name="status" value={selectedRequest.status} onChange={handleStatusChange} className="status-dropdown-new">
+                  <select name="status" 
+                  value={selectedRequest.status} 
+                  onChange={(e) => handleStatusChange(selectedRequest.id, e.target.value)}
+                  className="status-dropdown-new">
                     <option value="READY">READY</option>
                     <option value="PROCESSING">PROCESSING</option>
                     <option value="CLAIMED">CLAIMED</option>
