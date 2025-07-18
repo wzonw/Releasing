@@ -91,6 +91,11 @@
   background-color: #003cff;
 }
 
+.status-tag.unpaid {
+  background-color: red;
+
+}
+
 .status-tag.processing {
   background-color: #fb9b00;
 }
