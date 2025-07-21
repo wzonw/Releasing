@@ -29,32 +29,37 @@ function Upload() {
 
 
   //save to database button
-  const handleSaveToDatabase = async () => {
-    if (!parsedSheetData.length) {
-      alert("No data to save."); //catch error walang database
-      return;
-    }
-    try {
-      const response = await fetch("http://localhost:3001/save-data", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ data: parsedSheetData })
-      });
+const handleVerifyData = async () => {
+  if (!parsedSheetData.length) {
+    alert("No data to verify.");
+    return;
+  }
 
-      if (!response.ok) throw new Error("Failed to save data");
+  try {
+    const response = await fetch("http://localhost:3001/verify-data", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ data: parsedSheetData })
+    });
 
-      alert("Data successfully saved to the database!");
-    } catch (err) {
-      console.error("Save failed:", err);
-      alert("Error saving data.");
-    }
-  };
+    if (!response.ok) throw new Error("Failed to verify data");
+
+    const result = await response.json();
+    console.log("Verification result:", result);
+
+    alert("Verification completed!");
+  } catch (err) {
+    console.error("Verification failed:", err);
+    alert("Error verifying data.");
+  }
+};
+
 
 
   //File viewer for when clicking sa mga uploaded
-  const handleFileClick = async (fileName) => {
+const handleFileClick = async (fileName) => {
     try {
       const response = await fetch(`http://localhost:3001/annex/${fileName}`);
       const blob = await response.blob();
@@ -250,7 +255,7 @@ setShowPreview(true);
                           ))}
                         </select>
                       )}
-                        <button className="save-btn" onClick={handleSaveToDatabase}>
+                        <button className="save-btn" onClick={handleVerifyData}>
                           Save
                         </button>
                       <label htmlFor="file-upload" className="upload-btn">

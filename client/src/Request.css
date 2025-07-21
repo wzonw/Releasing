@@ -1,30 +1,25 @@
-.bodyreq{
+.bodyreq {
     margin-top: 0rem;
 }
 
 .container {
-  font-family: Arial, sans-serif;
-  /* Adjust margin-top to account for the sticky header now */
-  /* This value may need fine-tuning based on the exact height of your Header component and the sticky .top-actions-bar-right */
-  margin-top: 5rem; /* This sets the content below your fixed header and sticky download button */
-  padding: 1rem;
-  font-size: small;
+    font-family: Arial, sans-serif;
+    margin-top: 5rem;
+    padding: 1rem;
+    font-size: small;
 }
 
-/* Changed top-actions-bar to align download button to right */
 .top-actions-bar-right {
     display: flex;
-    justify-content: flex-end; /* Aligns content to the right */
+    justify-content: flex-end;
     align-items: center;
     margin-bottom: 1rem;
     padding: 1rem;
-    /* --- NEW STYLES FOR STICKY DOWNLOAD BUTTON --- */
-    position: sticky; /* Make the element sticky */
-    top: 0; /* Stick to the top of the viewport. Adjust if there's a higher sticky header */
-    background-color: #f0f2f5; /* Add a background color so content doesn't show through */
-    z-index: 1000; /* Ensure it stays on top of other content when scrolling */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: add a subtle shadow */
-    /* --- END NEW STYLES --- */
+    position: sticky;
+    top: 0;
+    background-color: #f0f2f5;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     flex-wrap: wrap;
     gap: 15px;
 }
@@ -53,21 +48,18 @@
     font-size: 1rem;
 }
 
-
-/* Filter bar adjustments for all inputs and dropdowns */
 .filter-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px; /* Gap between filter items */
+    gap: 10px;
     margin: 0;
     justify-content: flex-start;
     background: #2c5edb;
-    padding: 1rem; /* This padding is key for dropdown alignment calculation */
+    padding: 1rem;
     border-radius: 5px;
     align-items: center;
 }
 
-/* Base style for all inputs and dropdown headers within the filter bar */
 .filter-bar input,
 .filter-bar .dropdown-header {
     padding: 0.6rem 0.8rem;
@@ -82,7 +74,6 @@
     min-width: 140px;
 }
 
-/* Wrapper for input fields to include search icon */
 .filter-input-wrapper {
     position: relative;
     flex-grow: 1;
@@ -108,10 +99,9 @@
     min-width: 120px;
 }
 
-/* Custom Dropdown Styles */
 .custom-dropdown-container {
     position: relative;
-    min-width: 140px; /* Ensure header has a minimum width */
+    min-width: 140px;
     flex-grow: 1;
 }
 
@@ -126,10 +116,10 @@
     font-size: 0.9rem;
     color: #333;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
-    white-space: nowrap; /* Keep header text on one line */
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    box-sizing: border-box; /* Ensure padding is included in width */
+    box-sizing: border-box;
 }
 
 .dropdown-header:hover {
@@ -144,51 +134,49 @@
 
 .dropdown-menu {
     position: absolute;
-    top: 100%; /* Position right below the header */
-    left: 0;   /* Align left edge with the dropdown-header */
-    /* CRITICAL: Explicitly define width using a generous fixed pixel value or `max-content`. */
-    /* `max-content` will make the menu as wide as its widest item. */
-    width: max-content; /* This is ideal if supported across all target browsers */
-    min-width: 100%; /* Ensure it's at least as wide as the header */
-    /* If `max-content` causes issues, uncomment the line below and use a large fixed pixel value */
-    /* width: 380px; /* Example fixed width. Adjust this carefully if max-content doesn't work. */
-    max-width: 450px; /* Still good to have an upper limit for extremely long items */
-
+    top: 100%;
+    left: 0;
+    width: max-content;
+    min-width: 100%;
+    max-width: 450px;
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     z-index: 100;
-    padding: 5px 0; /* Small vertical padding, no horizontal padding here */
-    box-sizing: border-box; /* Crucial: padding and border are included in width/height */
+    padding: 5px 0;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* Allow scrolling if content overflows vertically */
-    max-height: 200px; /* Limit height to prevent menu from getting too long */
-    overflow-x: hidden; /* Hide horizontal scrollbar always */
+    overflow-y: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}
+
+.custom-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .dropdown-item {
-    display: flex; /* Make dropdown-item a flex container */
-    align-items: center; /* Vertically align custom checkbox and label */
-    justify-content: flex-start; /* Align content to the left */
-    padding: 8px 12px; /* Consistent internal padding for each menu item */
-    gap: 8px; /* Space between the custom visual checkbox and its label */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 12px;
     cursor: pointer;
     font-size: 0.9rem;
     color: #333;
-    white-space: nowrap; /* CRITICAL: Prevent the entire line (checkbox + label) from wrapping */
-    box-sizing: border-box; /* Padding is included in item's total width */
-    overflow: hidden; /* Hide overflow content if white-space: nowrap causes it */
-    text-overflow: ellipsis; /* Add ellipsis for overflowing text that *truly* doesn't fit */
-    flex-shrink: 0; /* Prevent the entire item from shrinking if parent is too small */
+    box-sizing: border-box;
 }
 
 .dropdown-item:hover {
     background-color: #f5f5f5;
 }
 
-/* IMPORTANT: Hide the native checkbox visually, but keep it interactive. */
 .dropdown-item input[type="checkbox"] {
     position: absolute;
     opacity: 0;
@@ -197,75 +185,58 @@
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0); /* For screen readers */
-    white-space: nowrap; /* For screen readers */
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
     border: 0;
 }
 
-/* Create the custom checkbox appearance using the label's ::before pseudo-element. */
 .dropdown-item label {
-    display: flex; /* Make the label a flex container to align its content */
-    align-items: center; /* Vertically align the custom box and text */
+    display: flex;
+    align-items: center;
     margin: 0 !important;
     padding: 0 !important;
     text-align: left;
     cursor: pointer;
-    white-space: nowrap; /* Prevent label text from wrapping */
-    
-    flex-grow: 1; /* Allow the label to take up remaining space */
-    flex-shrink: 1; /* Allow the label content to shrink if needed (ellipsis will manage) */
-    
-    line-height: 1.2; /* Consistent line height for the text */
-    position: relative; /* Needed for absolute positioning of ::before and ::after */
-    box-sizing: border-box; /* Ensure padding is included in calculations */
-    /* Remove overflow and text-overflow from here, they are on .dropdown-item */
+    line-height: 1.2;
+    position: relative;
+    box-sizing: border-box;
 }
 
-/* Style the custom checkbox box using ::before on the label */
 .dropdown-item label::before {
     content: '';
-    display: inline-block; /* Make it behave like a block for sizing */
-    width: 16px; /* Size of the custom checkbox box */
-    height: 16px; /* Size of the custom checkbox box */
-    border: 1px solid #ccc; /* Border color for the custom box */
-    border-radius: 3px; /* Slightly rounded corners */
-    background-color: #fff; /* White background for the custom box */
-    flex-shrink: 0; /* Prevent it from shrinking */
-    margin-right: 8px; /* Space between custom box and label text (matches gap on .dropdown-item) */
-    box-sizing: border-box; /* Include padding/border in element's total size */
-    vertical-align: middle; /* Helps alignment */
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: #fff;
+    flex-shrink: 0;
+    margin-right: 8px;
+    box-sizing: border-box;
 }
 
-/* Style the checkmark when the hidden input is checked */
 .dropdown-item input[type="checkbox"]:checked + label::before {
-    background-color: #2c5edb; /* Blue background when checked */
-    border-color: #2c5edb; /* Blue border when checked */
+    background-color: #2c5edb;
+    border-color: #2c5edb;
 }
 
-/* Add the checkmark using ::after on the label, when the input is checked */
 .dropdown-item input[type="checkbox"]:checked + label::after {
-    content: '\2713'; /* Unicode checkmark character */
-    position: absolute; /* Position over the ::before box */
-    /* CRITICAL: Adjusted left position for more precise centering. */
-    /* This needs to be relative to the label's *start* and the checkbox's actual position. */
-    /* The `label::before` is `16px` wide and has `margin-right: 8px`. */
-    /* Its left edge is at the start of the label content area. */
-    /* So, the center of the checkbox is at `(16px / 2) = 8px` from the label's left edge. */
-    left: 8px; /* Target the center of the 16px wide ::before box relative to label's start */
-    top: 50%; /* Center vertically within the label's height */
-    transform: translate(-50%, -50%); /* Precisely center the checkmark on its own axis */
-    color: white; /* Checkmark color */
-    font-size: 12px; /* Size of the checkmark */
-    line-height: 1; /* For vertical alignment of the checkmark itself */
-    text-align: center; /* For horizontal alignment of the checkmark itself */
-    pointer-events: none; /* Make sure it doesn't interfere with clicks */
-    z-index: 2; /* Ensure checkmark is above the background of ::before */
+    content: '\2713';
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 11px;
+    line-height: 1;
+    text-align: center;
+    pointer-events: none;
+    z-index: 2;
 }
 
-/* Adding a focused state for accessibility */
 .dropdown-item input[type="checkbox"]:focus + label::before {
-    outline: 2px solid #2c5edb; /* Blue outline on focus */
-    outline-offset: 2px; /* Offset the outline from the checkbox */
+    outline: 2px solid #2c5edb;
+    outline-offset: 2px;
 }
 
 .search-request-button {
@@ -285,7 +256,6 @@
     background-color: #1565C0;
 }
 
-/* Original styles below remain largely unchanged */
 .document-table {
     width: 100%;
     table-layout: fixed;
@@ -309,7 +279,6 @@
     padding: 0.9rem;
     border-bottom: 1px solid #ccc;
     font-weight: bolder;
-
 }
 .pagination {
     display: flex;
@@ -333,7 +302,6 @@
     cursor: not-allowed;
 }
 
-
 .status-tag {
     padding: 0.3rem 0.8rem;
     border-radius: 15px;
@@ -345,14 +313,16 @@
     min-width: 80px;
 }
 
-/* Changed .status-tag.ready to .status-tag.forrelease to match "For Release" */
+.status-tag.ready {
+    background-color: #003cff;
+}
+
 .status-tag.forrelease {
     background-color: #003cff;
 }
 
 .status-tag.unpaid {
     background-color: red;
-
 }
 
 .status-tag.processing {
@@ -367,7 +337,6 @@
     cursor: pointer;
 }
 
-/* Modal Styles - New UI */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -376,61 +345,58 @@
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.6);
     display: grid;
-    place-items: center; /* Center the modal */
-    z-index: 9999; /* Increased z-index to ensure it's on top */
-    backdrop-filter: blur(4px); /* Optional: adds a blur effect to the background */
-    /* Add padding to the overlay itself to ensure space around the modal on smaller screens */
+    place-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
     padding: 10px;
-    box-sizing: border-box; /* Include padding in the element's total width and height */
+    box-sizing: border-box;
 }
 
-.modal-content-new { /* New class for the updated modal styling */
-    background-color: #f0f2f5; /* Light grey background for the modal */
+.modal-content-new {
+    background-color: #f0f2f5;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
     width: 90%;
-    max-width: 800px; /* Increased max-width for more content */
+    max-width: 800px;
     animation: fadeInScale 0.3s ease-out;
     display: flex;
     flex-direction: column;
     gap: 15px;
-    border: 1px solid #e0e0e0; /* Subtle border */
-    max-height: 90vh; /* Slightly reduced max-height to give more top/bottom clearance */
-    overflow-y: auto; /* Enable scrolling if content overflows */
-    /* Removed absolute positioning and transform as grid on overlay handles centering */
+    border: 1px solid #e0e0e0;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-header-new {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Changed to flex-start to align items to the top */
+    align-items: flex-start;
     padding-bottom: 10px;
     border-bottom: 1px solid #ddd;
     margin-bottom: 10px;
-    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    flex-wrap: wrap;
 }
 
 .request-information-text {
     font-size: 1rem;
     font-weight: 600;
     color: #555;
-    /* Added margin-right to push content away from the right side on larger screens */
     margin-right: auto;
-    padding-bottom: 5px; /* Add a little padding below the text */
+    padding-bottom: 5px;
 }
 
 .modal-header-right {
     display: flex;
-    flex-direction: column; /* Changed to column to stack status and reference number */
-    align-items: flex-end; /* Align items to the right */
-    gap: 5px; /* Reduced gap */
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
 }
 
 .reference-number {
     font-size: 0.9rem;
     color: #777;
-    text-align: right; /* Ensure text aligns right */
+    text-align: right;
 }
 
 .student-info-section {
@@ -467,7 +433,6 @@
     font-size: 0.8rem;
 }
 
-/* Modal form grid and fields */
 .form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -498,11 +463,11 @@
     box-sizing: border-box;
     font-size: 0.9rem;
     color: #333;
-    background-color: #f9f9f9; /* Slightly different background for readonly */
+    background-color: #f9f9f9;
 }
 
 .form-field.full-width {
-    grid-column: 1 / -1; /* Spans across all columns in the grid */
+    grid-column: 1 / -1;
 }
 
 .document-request-section {
@@ -523,7 +488,7 @@
 }
 
 .document-request-table-container {
-    overflow-x: auto; /* Allows table to scroll horizontally if content is too wide */
+    overflow-x: auto;
 }
 
 .document-request-table {
@@ -559,9 +524,9 @@
 }
 
 .total-amount-input {
-    width: 120px; /* Fixed width for the total amount input */
-    text-align: right; /* Align text to the right */
-    background-color: #e9ecef; /* Different background for total amount */
+    width: 120px;
+    text-align: right;
+    background-color: #e9ecef;
 }
 
 .modal-actions-new {

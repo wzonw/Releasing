@@ -118,8 +118,7 @@ app.get('/api/requests', async (req, res) => {
   }
 });
 
-
-
+//Not in use 
 // app.get('/api/shelfstatus', async (req, res) => {
 //   try {
 //     const result1 = await pool.query('SELECT request_id, shelfstatus, status FROM outgoing.shelfstatus AND outgoing.');
@@ -130,29 +129,65 @@ app.get('/api/requests', async (req, res) => {
 //   }
 // });
 
-app.post('/save-data', async (req, res) => {
+app.post('/verify-data', async (req, res) => {
   const { data } = req.body;
 
   try {
-    const insertPromises = data.map(row => {
-      const { "Last Name ": lastName, "First name ": firstName, "M.I.": mi, "Documents": documents } = row;
+    const verificationResults = [];
 
-      return pool.query(
-        'INSERT INTO releasing_records (last_name, first_name, middle_initial, documents) VALUES ($1, $2, $3, $4)',
-        [lastName, firstName, mi, documents]
+    for (const row of data) {
+      const lastName = row["Last Name "];
+      const firstName = row["First name "];
+      const documents = row["Documents"];
+
+      const result = await pool.query(
+        `SELECT * FROM outgoing.requests
+         WHERE lastname ILIKE $1 AND firstname ILIKE $2 AND documenttype ILIKE $3`,
+        [lastName, firstName, documents]
       );
-    });
 
-    await Promise.all(insertPromises);
+      verificationResults.push({
+        name: `${firstName} ${lastName}`,
+        document: documents,
+        exists: result.rows.length > 0
+      });
+    }
 
-    res.status(200).json({ message: 'Data saved to PostgreSQL!' });
+    res.json(verificationResults);
   } catch (err) {
-    console.error('DB save error:', err);
-    res.status(500).json({ error: 'Failed to save data' });
+    console.error('Verification error:', err);
+    res.status(500).json({ error: 'Verification failed' });
   }
 });
 
+
 const upload = multer({ storage });
+
+//UPDATE BY WHO
+app.put('/api/update-status', async (req, res) => {
+  try {
+    const { request_id, shelfstatus, updatedby } = req.body;
+
+    if (!request_id || !shelfstatus || !updatedby) {
+      return res.status(400).send('Missing required fields');
+    }
+
+    console.log('Incoming update request:', req.body);
+    const result = await pool.query(
+      `INSERT INTO shelfstatus (request_id, shelfstatus, updatedby, updatedat)
+       VALUES ($1, $2, $3, NOW())`,
+      [request_id, shelfstatus, updatedby]
+    );
+
+    res.status(200).send('Status updated successfully');
+  } catch (error) {
+    console.error('Error in /api/update-status:', error);
+    res.status(500).send('Server error while updating status');
+  }
+});
+
+
+
 
 app.post('/upload', upload.single('file'), (req, res) => {
   res.json({ message: 'File uploaded successfully', filePath: `/annex/${req.file.filename}` });

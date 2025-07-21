@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Header from './Header'; // Assuming Header.js is in the same directory
-import axios from 'axios'; // Assuming you have axios installed for API calls
-import './Request.css'; // Make sure this path is correct for your CSS file
+import Header from './Header'; 
+import axios from 'axios'; 
+import './Request.css'; 
 
 const Request = () => {
-    // State for search filters
     const [search, setSearch] = useState({
         lastname: '',
         firstname: '',
@@ -14,86 +13,62 @@ const Request = () => {
         status: [],
     });
 
-    // State for dropdown visibility
     const [showCourseDropdown, setShowCourseDropdown] = useState(false);
     const [showDocumentTypeDropdown, setShowDocumentTypeDropdown] = useState(false);
     const [showStatusFilterDropdown, setShowStatusFilterDropdown] = useState(false);
-    const [showStatusDropdown, setShowStatusDropdown] = useState(false); // For modal status dropdown
+    const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
-    // State for modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
 
-    // State for data and pagination
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 7; 
 
-    // Options for dropdowns (replace with your actual options or fetch from API)
-    const courseOptions = ['BS INFORMATION TECHNOLOGY', 'BS PSYCHOLOGY', 'BS ARCHITECTURE'];
-    const documentTypeOptions = ['Transcript of Records', 'Good Moral Certificate', 'Certificate of Enrollment'];
-    const statusOptions = ['For Release', 'Processing', 'Claimed', 'Unpaid'];
-
-    // Refs for clicking outside dropdowns
     const courseDropdownRef = useRef(null);
     const documentTypeDropdownRef = useRef(null);
     const statusFilterDropdownRef = useRef(null);
+    const statusModalDropdownRef = useRef(null);
 
-    // Fetch data (example, replace with your actual API endpoint)
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // Replace with your actual API endpoint
-                const response = await axios.get('http://localhost:5000/api/requests'); // Example endpoint
-                setData(response.data);
-                setFilteredData(response.data); // Initialize filtered data with all data
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-        fetchData();
-    }, []);
+    const courseOptions = ['BSIT', 'BSCS', 'BSA', 'BSN', 'BSED'];
+    const documentTypeOptions = ['Transcript of Records', 'Good Moral Certificate', 'Diploma'];
+    const statusOptions = ['READY', 'PROCESSING', 'CLAIMED', 'UNPAID'];
 
-    // Effect for filtering data whenever search state changes
-    useEffect(() => {
-        const applyFilters = () => {
-            let temp = data.filter(request => {
-                const matchesLastName = search.lastname
-                    ? request.lastname.toLowerCase().includes(search.lastname.toLowerCase())
-                    : true;
-                const matchesFirstName = search.firstname
-                    ? request.firstname.toLowerCase().includes(search.firstname.toLowerCase())
-                    : true;
-                const matchesDateSubmitted = search.datesubmitted
-                    ? request.datesubmitted.includes(search.datesubmitted) // Assuming YYYYMMDD format
-                    : true;
-                const matchesDegreeProgram = search.degreeprogram.length > 0
-                    ? search.degreeprogram.includes(request.degreeprogram)
-                    : true;
-                const matchesDocumentType = search.documenttype.length > 0
-                    ? search.documenttype.includes(request.documenttype)
-                    : true;
-                const matchesStatus = search.status.length > 0
-                    ? search.status.includes(request.status)
-                    : true;
+    const fetchRequests = async () => {
+        try {
+            const response = await axios.get('http://localhost:3001/api/requests');
+            const allRequests = response.data;
 
-                return matchesLastName && matchesFirstName && matchesDateSubmitted &&
-                       matchesDegreeProgram && matchesDocumentType && matchesStatus;
+            const newFilteredData = allRequests.filter(request => {
+                const matchesLastName = search.lastname === '' || request.lastname.toLowerCase().includes(search.lastname.toLowerCase());
+                const matchesFirstName = search.firstname === '' || request.firstname.toLowerCase().includes(search.firstname.toLowerCase());
+                const matchesDate = search.datesubmitted === '' || request.datesubmitted.includes(search.datesubmitted);
+                const matchesDegreeProgram = search.degreeprogram.length === 0 || search.degreeprogram.includes(request.degreeprogram);
+                const matchesDocumentType = search.documenttype.length === 0 || search.documenttype.includes(request.documenttype);
+                const matchesStatus = search.status.length === 0 || search.status.includes(request.status);
+
+                return matchesLastName && matchesFirstName && matchesDate && matchesDegreeProgram && matchesDocumentType && matchesStatus;
             });
-            setFilteredData(temp);
-            setCurrentPage(1); // Reset to first page on filter change
-        };
-        applyFilters();
-    }, [search, data]); // Depend on search and data
 
-    // Handle search input changes (for text fields)
+            setData(allRequests);
+            setFilteredData(newFilteredData);
+            setCurrentPage(1);
+            console.log('Fetched and filtered requests:', newFilteredData);
+        } catch (error) {
+            console.error('Error fetching requests:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchRequests();
+    }, [search]);
+
     const handleSearchInputChange = (e) => {
         const { name, value } = e.target;
         setSearch(prev => ({ ...prev, [name]: value }));
     };
 
-    // Handle multi-select dropdown changes
     const handleMultiSelectChange = (filterName, option) => {
         setSearch(prev => {
             const currentOptions = prev[filterName];
@@ -101,8 +76,8 @@ const Request = () => {
 
             if (option === 'Select All') {
                 newOptions = currentOptions.length === getOptions(filterName).length
-                    ? [] // Deselect all
-                    : getOptions(filterName); // Select all
+                    ? [] 
+                    : getOptions(filterName); 
             } else {
                 if (currentOptions.includes(option)) {
                     newOptions = currentOptions.filter(item => item !== option);
@@ -114,7 +89,6 @@ const Request = () => {
         });
     };
 
-    // Helper to get options for a given filter name
     const getOptions = (filterName) => {
         switch (filterName) {
             case 'degreeprogram': return courseOptions;
@@ -124,7 +98,6 @@ const Request = () => {
         }
     };
 
-    // Get header text for dropdowns
     const getDropdownHeaderText = (selectedItems, allOptions, defaultText) => {
         if (selectedItems.length === 0) {
             return defaultText;
@@ -137,7 +110,6 @@ const Request = () => {
         }
     };
 
-    // Handle clicks outside dropdowns to close them
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (courseDropdownRef.current && !courseDropdownRef.current.contains(event.target)) {
@@ -149,20 +121,21 @@ const Request = () => {
             if (statusFilterDropdownRef.current && !statusFilterDropdownRef.current.contains(event.target)) {
                 setShowStatusFilterDropdown(false);
             }
+            if (statusModalDropdownRef.current && !statusModalDropdownRef.current.contains(event.target) && showStatusDropdown) {
+                setShowStatusDropdown(false);
+            }
         };
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, []);
+    }, [showStatusDropdown]);
 
-    // Pagination logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const paginatedData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedData = filteredData.slice(startIndex, endIndex);
 
-    // Modal Handlers
     const handleRowClick = (request) => {
         setSelectedRequest(request);
         setIsModalOpen(true);
@@ -171,19 +144,41 @@ const Request = () => {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setSelectedRequest(null);
-        setShowStatusDropdown(false); // Close status dropdown when modal closes
+        setShowStatusDropdown(false);
     };
 
-    const handleStatusChange = (e) => {
-        const newStatus = e.target.value;
-        setSelectedRequest(prev => ({ ...prev, status: newStatus }));
-        // In a real app, you'd likely send this update to your backend here
-        console.log(`Updating request ${selectedRequest.formrequestid} status to: ${newStatus}`);
+    const handleStatusChange = async (requestId, newStatus) => {
+        try {
+            const updatedby = "Trisha Ann"; 
+
+            const response = await fetch("http://localhost:3001/api/update-status", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    request_id: requestId,
+                    shelfstatus: newStatus, 
+                    updatedby: updatedby
+                })
+            });
+
+            if (!response.ok) throw new Error("Update failed");
+
+            setSelectedRequest(prev => ({
+                ...prev,
+                status: newStatus 
+            }));
+            
+            fetchRequests(); 
+            alert("Status updated successfully!");
+            setShowStatusDropdown(false); 
+        } catch (err) {
+            console.error("Error updating status:", err);
+            alert("Error updating status.");
+        }
     };
 
     const handleDownloadList = () => {
-        // Implement your download list logic here
-        alert('Download List functionality will be implemented here!');
+        console.log("Download List button clicked!");
     };
 
     return (
@@ -191,8 +186,7 @@ const Request = () => {
             <div><Header /></div>
             <div className='container'>
                 <div className='body'>
-                    {/* Top actions bar - Only Download List button remains */}
-                    <div className="top-actions-bar-right"> {/* New class for right alignment */}
+                    <div className="top-actions-bar-right">
                         <button className="download-list-button" onClick={handleDownloadList}>
                             <i className="fas fa-download"></i> Download List
                         </button>
@@ -230,7 +224,6 @@ const Request = () => {
                             />
                         </div>
 
-                        {/* Custom Dropdown for Course */}
                         <div className="custom-dropdown-container" ref={courseDropdownRef}>
                             <div className="dropdown-header" onClick={() => setShowCourseDropdown(!showCourseDropdown)}>
                                 {getDropdownHeaderText(search.degreeprogram, courseOptions, "Select Course")}
@@ -238,9 +231,7 @@ const Request = () => {
                             </div>
                             {showCourseDropdown && (
                                 <div className="dropdown-menu">
-                                    {/* "Select All" Option */}
                                     <div className="dropdown-item">
-                                        {/* CRITICAL: Add custom-checkbox-wrapper around input and label */}
                                         <div className="custom-checkbox-wrapper">
                                             <input
                                                 type="checkbox"
@@ -251,10 +242,8 @@ const Request = () => {
                                             <label htmlFor="selectAllCourse">Select All</label>
                                         </div>
                                     </div>
-                                    {/* Individual Course Options */}
                                     {courseOptions.map(option => (
                                         <div key={option} className="dropdown-item">
-                                            {/* CRITICAL: Add custom-checkbox-wrapper around input and label */}
                                             <div className="custom-checkbox-wrapper">
                                                 <input
                                                     type="checkbox"
@@ -270,7 +259,6 @@ const Request = () => {
                             )}
                         </div>
 
-                        {/* Custom Dropdown for Document Type */}
                         <div className="custom-dropdown-container" ref={documentTypeDropdownRef}>
                             <div className="dropdown-header" onClick={() => setShowDocumentTypeDropdown(!showDocumentTypeDropdown)}>
                                 {getDropdownHeaderText(search.documenttype, documentTypeOptions, "Select Document Type")}
@@ -279,7 +267,6 @@ const Request = () => {
                             {showDocumentTypeDropdown && (
                                 <div className="dropdown-menu">
                                     <div className="dropdown-item">
-                                        {/* CRITICAL: Add custom-checkbox-wrapper around input and label */}
                                         <div className="custom-checkbox-wrapper">
                                             <input
                                                 type="checkbox"
@@ -292,7 +279,6 @@ const Request = () => {
                                     </div>
                                     {documentTypeOptions.map(option => (
                                         <div key={option} className="dropdown-item">
-                                            {/* CRITICAL: Add custom-checkbox-wrapper around input and label */}
                                             <div className="custom-checkbox-wrapper">
                                                 <input
                                                     type="checkbox"
@@ -308,7 +294,6 @@ const Request = () => {
                             )}
                         </div>
 
-                        {/* Custom Dropdown for Status */}
                         <div className="custom-dropdown-container" ref={statusFilterDropdownRef}>
                             <div className="dropdown-header" onClick={() => setShowStatusFilterDropdown(!showStatusFilterDropdown)}>
                                 {getDropdownHeaderText(search.status, statusOptions, "Select Status")}
@@ -317,7 +302,6 @@ const Request = () => {
                             {showStatusFilterDropdown && (
                                 <div className="dropdown-menu">
                                     <div className="dropdown-item">
-                                        {/* CRITICAL: Add custom-checkbox-wrapper around input and label */}
                                         <div className="custom-checkbox-wrapper">
                                             <input
                                                 type="checkbox"
@@ -330,7 +314,6 @@ const Request = () => {
                                     </div>
                                     {statusOptions.map(option => (
                                         <div key={option} className="dropdown-item">
-                                            {/* CRITICAL: Add custom-checkbox-wrapper around input and label */}
                                             <div className="custom-checkbox-wrapper">
                                                 <input
                                                     type="checkbox"
@@ -345,7 +328,7 @@ const Request = () => {
                                 </div>
                             )}
                         </div>
-                        <button className="search-request-button">SEARCH REQUEST</button>
+                        <button className="search-request-button" onClick={fetchRequests}>SEARCH REQUEST</button>
                     </div>
 
                     <table className="document-table">
@@ -360,14 +343,14 @@ const Request = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {paginatedData.map((requests) => (
-                                <tr key={requests.id} onClick={() => handleRowClick(requests)} className="table-row-clickable">
-                                    <td className='Sname'>{requests.lastname}</td>
-                                    <td className='Sname'>{requests.firstname}</td>
-                                    <td>{requests.datesubmitted}</td>
-                                    <td>{requests.degreeprogram}</td>
-                                    <td>{requests.documenttype}</td>
-                                    <td><span className={`status-tag ${requests.status?.toLowerCase().replace(/\s/g, '')}`}>{requests.status}</span></td>
+                            {paginatedData.map((request) => ( 
+                                <tr key={request.id} onClick={() => handleRowClick(request)} className="table-row-clickable">
+                                    <td className='Sname'>{request.lastname}</td>
+                                    <td className='Sname'>{request.firstname}</td>
+                                    <td>{request.datesubmitted}</td>
+                                    <td>{request.degreeprogram}</td>
+                                    <td>{request.documenttype}</td>
+                                    <td><span className={`status-tag ${request.status?.toLowerCase().replace(/\s/g, '')}`}>{request.status}</span></td>
                                 </tr>
                             ))}
                         </tbody>
@@ -388,14 +371,13 @@ const Request = () => {
                 </div>
             </div>
 
-            {/* Modal */}
             {isModalOpen && selectedRequest && (
                 <div className="modal-overlay">
                     <div className="modal-content-new">
                         <div className="modal-header-new">
                             <span className="request-information-text">Request Information</span>
                             <div className="modal-header-right">
-                                <span className={`status-tag ${selectedRequest.status.toLowerCase().replace(/\s/g, '')}`}>{selectedRequest.status}</span>
+                                <span className={`status-tag ${selectedRequest.status?.toLowerCase().replace(/\s/g, '')}`}>{selectedRequest.status}</span>
                                 <span className="reference-number">[{selectedRequest.formrequestid}]</span>
                             </div>
                         </div>
@@ -451,11 +433,17 @@ const Request = () => {
                                 EDIT STATUS
                             </button>
                             {showStatusDropdown && (
-                                <select name="status" value={selectedRequest.status} onChange={handleStatusChange} className="status-dropdown-new">
-                                    <option value="For Release">For Release</option>
-                                    <option value="Processing">Processing</option>
-                                    <option value="Claimed">Claimed</option>
-                                    <option value="Unpaid">Unpaid</option>
+                                <select 
+                                    name="status"
+                                    value={selectedRequest.status}
+                                    onChange={(e) => handleStatusChange(selectedRequest.id, e.target.value)}
+                                    className="status-dropdown-new"
+                                    ref={statusModalDropdownRef}
+                                >
+                                    <option value="READY">READY</option>
+                                    <option value="PROCESSING">PROCESSING</option>
+                                    <option value="CLAIMED">CLAIMED</option>
+                                    <option value="UNPAID">UNPAID</option>
                                 </select>
                             )}
                             <button onClick={handleCloseModal} className="modal-close-button-new">Close</button>
