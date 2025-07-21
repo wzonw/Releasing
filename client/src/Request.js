@@ -260,7 +260,7 @@
                   EDIT STATUS
                 </button>
                 {showStatusDropdown && (
-                  <select name="status" 
+                  <select
                   value={selectedRequest.status} 
                   onChange={(e) => handleStatusChange(selectedRequest.id, e.target.value)}
                   className="status-dropdown-new">
