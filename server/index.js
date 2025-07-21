@@ -6,7 +6,8 @@ const fs = require('fs');
 const pool = require('./db');
 require('dotenv').config();
 const app = express();
-const PORT = 3001;
+const host = '0.0.0.0'; // allows access from other devices
+const port = 3001;
 const UPLOADS_DIR = path.join(__dirname, 'public', 'annex');
 
 app.use(cors());
@@ -172,7 +173,6 @@ app.put('/api/update-status', async (req, res) => {
       return res.status(400).send('Missing required fields');
     }
 
-    console.log('Incoming update request:', req.body);
     const result = await pool.query(
       `INSERT INTO shelfstatus (request_id, shelfstatus, updatedby, updatedat)
        VALUES ($1, $2, $3, NOW())`,
@@ -202,6 +202,6 @@ app.post('/server/login', (req, res) => {
   res.json({ success: true, message: 'Login successful!' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(port, host, () => {
+  console.log(`Server running on http://${host}:${port}`);
 });
