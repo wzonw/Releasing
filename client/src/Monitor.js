@@ -1,5 +1,7 @@
 import './Monitor.css';
 import React, { useState } from 'react';
+//Need magkaiba sa clerk in charge kase shelf and proecssing lang pwede makita at claimed
+//no need for more attachments git push
 
 function Monitor() {
   const [search, setSearch] = useState({ lastName: '', firstName: '', dof: '', course: '', docType: '', status: '' });

@@ -129,6 +129,30 @@
     border-radius: 4px;
 }
 
+.list-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+}
+
+.select-all {
+  background-color: #eee;
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8f8f8;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
 .uploaded-file {
     display: flex;
     justify-content: space-between;

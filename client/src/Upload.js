@@ -4,6 +4,8 @@ import Header from './Header';
 import './Upload.css';
 
 function Upload() {
+  const importantColumns = ['last name', 'first name', 'documents'];
+  const [selectedRows, setSelectedRows] = useState([]);
   const [excelData, setExcelData] = useState({});
   const [sheetNames, setSheetNames] = useState([]);
   const [selectedSheet, setSelectedSheet] = useState('');
@@ -41,7 +43,7 @@ const handleVerifyData = async () => {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ data: parsedSheetData })
+      body: JSON.stringify({ data: selectedRows  })
     });
 
     if (!response.ok) throw new Error("Failed to verify data");
@@ -175,35 +177,95 @@ setShowPreview(true);
     }
   };
 
-  const renderExcelTable = () => {
-    if (!selectedSheet || !excelData[selectedSheet]) return null;
+  const renderExcelList = () => {
+      if (!selectedSheet || !excelData[selectedSheet]) return null;
 
-    const data = excelData[selectedSheet];
-    if (data.length === 0) return <p>No data in selected sheet.</p>;
+      const data = excelData[selectedSheet];
+      if (data.length === 0) return <p>No data in selected sheet.</p>;
 
-    const headers = data[0];
-    const rows = data.slice(1);
+      const headers = data[0];
+      const rows = data.slice(1);
 
-    return (
-      <table>
-        <thead>
-          <tr>
-            {headers.map((header, index) => (
-              <th key={index}>{header}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {headers.map((_, cellIndex) => (
-                <td key={cellIndex}>{row[cellIndex] || ''}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
+      const getRowObject = (row) => {
+      const normalizedRow = Object.fromEntries(
+        headers.map((header, i) => [header.trim().toLowerCase(), row[i]])
+      );
+
+      const result = {};
+      importantColumns.forEach(col => {
+        const lowerCol = col.toLowerCase();
+        result[col] = normalizedRow[lowerCol] || '';
+      });
+
+      return result;
+    };
+
+
+      const allRowObjects = rows.map(getRowObject);
+
+      const isRowSelected = (rowObject) => {
+        return selectedRows.some(
+          selected => JSON.stringify(selected) === JSON.stringify(rowObject)
+        );
+      };
+
+      const toggleRow = (index) => {
+        const rowObject = getRowObject(rows[index]);
+        const alreadySelected = isRowSelected(rowObject);
+
+        if (alreadySelected) {
+          setSelectedRows(selectedRows.filter(
+            row => JSON.stringify(row) !== JSON.stringify(rowObject)
+          ));
+        } else {
+          setSelectedRows([...selectedRows, rowObject]);
+        }
+      };
+
+      const allSelected = allRowObjects.every(isRowSelected);
+
+      const handleSelectAllToggle = () => {
+        if (allSelected) {
+          // Unselect all
+          setSelectedRows([]);
+        } else {
+          // Select all
+          setSelectedRows(allRowObjects);
+        }
+      };
+
+      return (
+        <div className="list-preview">
+          {/* Select All Checkbox */}
+          <div className="list-item select-all">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={handleSelectAllToggle}
+            />
+            <strong>Select All</strong>
+          </div>
+
+          {/* Individual List Items */}
+          {rows.map((row, rowIndex) => {
+            const rowObject = getRowObject(row);
+            const isSelected = isRowSelected(rowObject);
+
+            return (
+              <div key={rowIndex} className="list-item">
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => toggleRow(rowIndex)}
+                />
+                <span>
+                  {importantColumns.map(col => `${rowObject[col] || ''}`).join(' | ')}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      );
   };
 
   return (
@@ -265,7 +327,7 @@ setShowPreview(true);
                   </div>
                   
                   <div className="excel-table-container">
-                    {renderExcelTable()}
+                    {renderExcelList()}
                   </div>
                 </div>
               )}
