@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Header from './Header'; 
-import axios from 'axios'; 
-import './Request.css'; 
+import React, { useState, useEffect, useRef, useCallback } from 'react'; // Import useCallback
+import Header from './Header';
+import axios from 'axios';
+import './Request.css';
 
 const Request = () => {
     const [search, setSearch] = useState({
@@ -21,10 +21,11 @@ const Request = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
 
-    const [data, setData] = useState([]);
+    // Removed the 'data' state as it was assigned but never used.
+    // The 'allRequests' variable inside fetchRequests now serves its temporary purpose.
     const [filteredData, setFilteredData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 7; 
+    const itemsPerPage = 7;
 
     const courseDropdownRef = useRef(null);
     const documentTypeDropdownRef = useRef(null);
@@ -35,10 +36,12 @@ const Request = () => {
     const documentTypeOptions = ['Transcript of Records', 'Good Moral Certificate', 'Diploma'];
     const statusOptions = ['READY', 'PROCESSING', 'CLAIMED', 'UNPAID'];
 
-    const fetchRequests = async () => {
+    // Wrap fetchRequests in useCallback.
+    // It now depends on 'search' because its internal logic uses the 'search' state.
+    const fetchRequests = useCallback(async () => {
         try {
             const response = await axios.get('http://localhost:3001/api/requests');
-            const allRequests = response.data;
+            const allRequests = response.data; // This is a local variable, not a state variable.
 
             const newFilteredData = allRequests.filter(request => {
                 const matchesLastName = search.lastname === '' || request.lastname.toLowerCase().includes(search.lastname.toLowerCase());
@@ -51,18 +54,19 @@ const Request = () => {
                 return matchesLastName && matchesFirstName && matchesDate && matchesDegreeProgram && matchesDocumentType && matchesStatus;
             });
 
-            setData(allRequests);
             setFilteredData(newFilteredData);
             setCurrentPage(1);
             console.log('Fetched and filtered requests:', newFilteredData);
         } catch (error) {
             console.error('Error fetching requests:', error);
         }
-    };
+    }, [search]); // Dependency array for useCallback: fetchRequests depends on 'search'
 
+    // The useEffect now correctly depends on fetchRequests.
+    // Since fetchRequests is memoized by useCallback, this won't cause infinite loops.
     useEffect(() => {
         fetchRequests();
-    }, [search]);
+    }, [fetchRequests]);
 
     const handleSearchInputChange = (e) => {
         const { name, value } = e.target;
@@ -76,8 +80,8 @@ const Request = () => {
 
             if (option === 'Select All') {
                 newOptions = currentOptions.length === getOptions(filterName).length
-                    ? [] 
-                    : getOptions(filterName); 
+                    ? []
+                    : getOptions(filterName);
             } else {
                 if (currentOptions.includes(option)) {
                     newOptions = currentOptions.filter(item => item !== option);
@@ -149,14 +153,14 @@ const Request = () => {
 
     const handleStatusChange = async (requestId, newStatus) => {
         try {
-            const updatedby = "Trisha Ann"; 
+            const updatedby = "Trisha Ann";
 
             const response = await fetch("http://localhost:3001/api/update-status", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     request_id: requestId,
-                    shelfstatus: newStatus, 
+                    shelfstatus: newStatus,
                     updatedby: updatedby
                 })
             });
@@ -165,12 +169,12 @@ const Request = () => {
 
             setSelectedRequest(prev => ({
                 ...prev,
-                status: newStatus 
+                status: newStatus
             }));
-            
-            fetchRequests(); 
+
+            fetchRequests(); // Re-fetch data to update the table
             alert("Status updated successfully!");
-            setShowStatusDropdown(false); 
+            setShowStatusDropdown(false);
         } catch (err) {
             console.error("Error updating status:", err);
             alert("Error updating status.");
@@ -178,7 +182,58 @@ const Request = () => {
     };
 
     const handleDownloadList = () => {
-        console.log("Download List button clicked!");
+        const headers = [
+            'Last Name', 'First Name', 'Date of Request', 'Course',
+            'Document Type', 'Status', 'Student Number', 'OR Number',
+            'Year Admitted', 'Year Ended', 'Phone Number', 'Landline',
+            'Email Address', 'Quantity', 'Total Amount', 'Purpose of Request'
+        ];
+
+        const dataToDownload = filteredData;
+
+        const csvRows = dataToDownload.map(request => {
+            const formatField = (field) => {
+                if (field === null || field === undefined) return '';
+                return `"${String(field).replace(/"/g, '""')}"`;
+            };
+
+            const row = [
+                formatField(request.lastname),
+                formatField(request.firstname),
+                formatField(request.datesubmitted),
+                formatField(request.degreeprogram),
+                formatField(request.documenttype),
+                formatField(request.status),
+                formatField(request.studentnumber),
+                formatField(request.ornumber),
+                formatField(request.ayadmitted),
+                formatField(request.yearEnded),
+                formatField(request.phoneNumber),
+                formatField(request.landline),
+                formatField(request.email),
+                formatField(request.quantity),
+                formatField(request.totalamount),
+                formatField(request.purpose)
+            ];
+            return row.join(',');
+        });
+
+        const csvContent = [headers.join(','), ...csvRows].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'requests_list.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+        console.log("Download List button clicked! CSV generated.");
     };
 
     return (
@@ -188,13 +243,12 @@ const Request = () => {
                 <div className='body'>
                     <div className="top-actions-bar-right">
                         <button className="download-list-button" onClick={handleDownloadList}>
-                            <i className="fas fa-download"></i> Download List
+                            Download
                         </button>
                     </div>
 
                     <div className="filter-bar">
                         <div className="filter-input-wrapper">
-                            <i className="fas fa-search search-icon"></i>
                             <input
                                 type="text"
                                 placeholder="Select Last Name"
@@ -204,7 +258,6 @@ const Request = () => {
                             />
                         </div>
                         <div className="filter-input-wrapper">
-                            <i className="fas fa-search search-icon"></i>
                             <input
                                 type="text"
                                 placeholder="Select First Name"
@@ -227,7 +280,7 @@ const Request = () => {
                         <div className="custom-dropdown-container" ref={courseDropdownRef}>
                             <div className="dropdown-header" onClick={() => setShowCourseDropdown(!showCourseDropdown)}>
                                 {getDropdownHeaderText(search.degreeprogram, courseOptions, "Select Course")}
-                                <i className={`fas ${showCourseDropdown ? 'fa-chevron-up' : 'fa-chevron-down'} dropdown-arrow`}></i>
+                                <span className="dropdown-arrow">{showCourseDropdown ? '▲' : '▼'}</span>
                             </div>
                             {showCourseDropdown && (
                                 <div className="dropdown-menu">
@@ -262,7 +315,7 @@ const Request = () => {
                         <div className="custom-dropdown-container" ref={documentTypeDropdownRef}>
                             <div className="dropdown-header" onClick={() => setShowDocumentTypeDropdown(!showDocumentTypeDropdown)}>
                                 {getDropdownHeaderText(search.documenttype, documentTypeOptions, "Select Document Type")}
-                                <i className={`fas ${showDocumentTypeDropdown ? 'fa-chevron-up' : 'fa-chevron-down'} dropdown-arrow`}></i>
+                                <span className="dropdown-arrow">{showDocumentTypeDropdown ? '▲' : '▼'}</span>
                             </div>
                             {showDocumentTypeDropdown && (
                                 <div className="dropdown-menu">
@@ -297,7 +350,7 @@ const Request = () => {
                         <div className="custom-dropdown-container" ref={statusFilterDropdownRef}>
                             <div className="dropdown-header" onClick={() => setShowStatusFilterDropdown(!showStatusFilterDropdown)}>
                                 {getDropdownHeaderText(search.status, statusOptions, "Select Status")}
-                                <i className={`fas ${showStatusFilterDropdown ? 'fa-chevron-up' : 'fa-chevron-down'} dropdown-arrow`}></i>
+                                <span className="dropdown-arrow">{showStatusFilterDropdown ? '▲' : '▼'}</span>
                             </div>
                             {showStatusFilterDropdown && (
                                 <div className="dropdown-menu">
@@ -328,7 +381,9 @@ const Request = () => {
                                 </div>
                             )}
                         </div>
-                        <button className="search-request-button" onClick={fetchRequests}>SEARCH REQUEST</button>
+                        <button className="search-request-button" onClick={fetchRequests}>
+                            Search
+                        </button>
                     </div>
 
                     <table className="document-table">
@@ -343,7 +398,7 @@ const Request = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {paginatedData.map((request) => ( 
+                            {paginatedData.map((request) => (
                                 <tr key={request.id} onClick={() => handleRowClick(request)} className="table-row-clickable">
                                     <td className='Sname'>{request.lastname}</td>
                                     <td className='Sname'>{request.firstname}</td>
@@ -433,7 +488,7 @@ const Request = () => {
                                 EDIT STATUS
                             </button>
                             {showStatusDropdown && (
-                                <select 
+                                <select
                                     name="status"
                                     value={selectedRequest.status}
                                     onChange={(e) => handleStatusChange(selectedRequest.id, e.target.value)}

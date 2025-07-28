@@ -33,9 +33,8 @@
     cursor: pointer;
     font-size: 0.9rem;
     font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    /* Removed icon-specific display/alignment properties */
+    text-align: center; /* Center text if no icon */
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
@@ -44,9 +43,7 @@
     transform: translateY(-1px);
 }
 
-.download-list-button i {
-    font-size: 1rem;
-}
+/* Removed .download-list-button i selector */
 
 .filter-bar {
     display: flex;
@@ -82,17 +79,10 @@
 
 .filter-input-wrapper input {
     width: 100%;
-    padding-left: 2.2rem;
+    padding-left: 0.8rem; /* Adjusted padding, no icon to make space for */
 }
 
-.filter-input-wrapper .search-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #888;
-    font-size: 0.9rem;
-}
+/* Removed .filter-input-wrapper .search-icon selector */
 
 .date-input {
     text-align: center;
@@ -130,6 +120,7 @@
     margin-left: 10px;
     color: #555;
     flex-shrink: 0;
+    font-size: 0.7em; /* Keep a readable size for the ▲/▼ symbols */
 }
 
 .dropdown-menu {
@@ -250,7 +241,11 @@
     transition: background-color 0.2s ease;
     padding: 0.6rem 1.2rem;
     min-width: 140px;
+    /* Removed icon-specific display/alignment properties */
+    text-align: center; /* Center text if no icon */
 }
+
+/* Removed .search-request-button i selector */
 
 .search-request-button:hover {
     background-color: #1565C0;
