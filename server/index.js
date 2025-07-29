@@ -5,8 +5,9 @@ const path = require('path');
 const fs = require('fs');
 const pool = require('./db');
 require('dotenv').config();
+
 const app = express();
-const host = '0.0.0.0'; // allows access from other devices
+const host = '0.0.0.0';
 const port = 3001;
 const UPLOADS_DIR = path.join(__dirname, 'public', 'annex');
 
@@ -14,6 +15,21 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+// Serve uploaded annex files
+app.use('/annex', express.static(path.join(__dirname, 'public/annex')));
+
+// Configure multer storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, 'public/annex'));
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  }
+});
+const upload = multer({ storage });
+
+// File listing
 app.get('/files', (req, res) => {
   fs.readdir(UPLOADS_DIR, (err, files) => {
     if (err) {
@@ -24,9 +40,10 @@ app.get('/files', (req, res) => {
   });
 });
 
+// File deletion
 app.delete('/delete/:filename', (req, res) => {
   const filename = req.params.filename;
-  const filepath = path.join(__dirname, 'public', 'annex', filename);
+  const filepath = path.join(UPLOADS_DIR, filename);
 
   fs.unlink(filepath, (err) => {
     if (err) {
@@ -37,17 +54,7 @@ app.delete('/delete/:filename', (req, res) => {
   });
 });
 
-app.use('/annex', express.static(path.join(__dirname, 'public/annex')));
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, 'public/annex'));
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  }
-});
-
-// Test connection
+// Test DB connection
 app.get('/server/test', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
@@ -58,7 +65,7 @@ app.get('/server/test', async (req, res) => {
   }
 });
 
-// fetch from request table with filter support
+// Fetch requests with filters
 app.get('/api/requests', async (req, res) => {
   try {
     const { lastname, firstname, datesubmitted, degreeprogram, documenttype, status } = req.query;
@@ -137,52 +144,82 @@ app.get('/api/requests', async (req, res) => {
   }
 });
 
-//Not in use 
-// app.get('/api/shelfstatus', async (req, res) => {
-//   try {
-//     const result1 = await pool.query('SELECT request_id, shelfstatus, status FROM outgoing.shelfstatus AND outgoing.');
-//     res.json(result1.rows);
-//   } catch (err) {
-//     console.error('Error fetching shelfstatus:', err.message);
-//     res.status(500).send('Server error');
-//   }
-// });
-
+// Bulk verification and update
 app.post('/verify-data', async (req, res) => {
   const { data } = req.body;
+  const updatedby = 'System'; // Change this to your actual username logic
 
   try {
     const verificationResults = [];
 
     for (const row of data) {
-      const lastName = row["Last Name "];
-      const firstName = row["First name "];
-      const documents = row["Documents"];
+      console.log("Row being processed:", row);
+
+      // Normalize keys by lowercasing and trimming
+      const rowKeys = Object.keys(row).reduce((acc, key) => {
+        acc[key.trim().toLowerCase()] = row[key];
+        return acc;
+      }, {});
+
+      const lastName = rowKeys["last name"];
+      const firstName = rowKeys["first name"];
+      const documents = rowKeys["documents"];
+
+      console.log(`Checking: ${firstName} ${lastName} - ${documents}`);
+
+      if (!lastName || !firstName || !documents) {
+        verificationResults.push({
+          name: `${firstName ?? 'N/A'} ${lastName ?? 'N/A'}`,
+          document: documents ?? 'N/A',
+          updated: false,
+          error: 'Missing data'
+        });
+        continue;
+      }
 
       const result = await pool.query(
-        `SELECT * FROM outgoing.requests
+        `SELECT id FROM outgoing.requests
          WHERE lastname ILIKE $1 AND firstname ILIKE $2 AND documenttype ILIKE $3`,
         [lastName, firstName, documents]
       );
 
-      verificationResults.push({
-        name: `${firstName} ${lastName}`,
-        document: documents,
-        exists: result.rows.length > 0
-      });
+      if (result.rows.length > 0) {
+        const requestId = result.rows[0].id;
+
+        await pool.query(
+          `INSERT INTO outgoing.shelfstatus (request_id, shelfstatus, updatedby, updatedat)
+           VALUES ($1, $2, $3, NOW())
+           ON CONFLICT (request_id) DO UPDATE SET
+             shelfstatus = EXCLUDED.shelfstatus,
+             updatedby = EXCLUDED.updatedby,
+             updatedat = NOW()`,
+          [requestId, 'READY', updatedby]
+        );
+
+        verificationResults.push({
+          name: `${firstName} ${lastName}`,
+          document: documents,
+          updated: true
+        });
+      } else {
+        verificationResults.push({
+          name: `${firstName} ${lastName}`,
+          document: documents,
+          updated: false,
+          error: 'Request not found'
+        });
+      }
     }
 
     res.json(verificationResults);
   } catch (err) {
-    console.error('Verification error:', err);
-    res.status(500).json({ error: 'Verification failed' });
+    console.error('Verification and update error:', err);
+    res.status(500).json({ error: 'Verification/update failed' });
   }
 });
 
 
-const upload = multer({ storage });
-
-//UPDATE BY WHO
+// Manual status update
 app.put('/api/update-status', async (req, res) => {
   try {
     const { request_id, shelfstatus, updatedby } = req.body;
@@ -191,7 +228,7 @@ app.put('/api/update-status', async (req, res) => {
       return res.status(400).send('Missing required fields');
     }
 
-    const result = await pool.query(
+    await pool.query(
       `INSERT INTO shelfstatus (request_id, shelfstatus, updatedby, updatedat)
        VALUES ($1, $2, $3, NOW())`,
       [request_id, shelfstatus, updatedby]
@@ -204,9 +241,9 @@ app.put('/api/update-status', async (req, res) => {
   }
 });
 
-//DASHBOARD 
+// Dashboard data
 app.get('/api/dashboard', async (req, res) => {
- try {
+  try {
     const result = await pool.query(`
       SELECT
         r.selectedcollege,
@@ -229,12 +266,10 @@ app.get('/api/dashboard', async (req, res) => {
       const { selectedcollege, graduationdate, status } = row;
       const isGraduate = graduationdate !== null;
 
-      // Count status
       if (status === 'Pending') statusCounts.pending++;
       else if (status === 'Processing') statusCounts.processing++;
       else if (status === 'Shelf') statusCounts.shelf++;
 
-      // Build per-college stats
       if (!graduateCounts[selectedcollege]) {
         graduateCounts[selectedcollege] = {
           selectedcollege,
@@ -266,11 +301,12 @@ app.get('/api/dashboard', async (req, res) => {
   }
 });
 
-
+// File upload
 app.post('/upload', upload.single('file'), (req, res) => {
   res.json({ message: 'File uploaded successfully', filePath: `/annex/${req.file.filename}` });
 });
 
+// Server test and login dummy routes
 app.get("/server/message", (req, res) => {
   res.json({ message: "It Works!" });
 });
@@ -280,6 +316,7 @@ app.post('/server/login', (req, res) => {
   res.json({ success: true, message: 'Login successful!' });
 });
 
+// Server start
 app.listen(port, host, () => {
   console.log(`Server running on http://${host}:${port}`);
 });
