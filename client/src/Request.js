@@ -185,7 +185,7 @@ const Request = () => {
         const headers = [
             'Last Name', 'First Name', 'Date of Request', 'Course',
             'Document Type', 'Status', 'Student Number', 'OR Number',
-            'Year Admitted', 'Year Ended', 'Phone Number', 'Landline',
+            'Year Admitted', 'Year Ended', 'Phone Number', 'College',
             'Email Address', 'Quantity', 'Total Amount', 'Purpose of Request'
         ];
 
@@ -207,10 +207,10 @@ const Request = () => {
                 formatField(request.studentnumber),
                 formatField(request.ornumber),
                 formatField(request.ayadmitted),
-                formatField(request.yearEnded),
-                formatField(request.phoneNumber),
-                formatField(request.landline),
-                formatField(request.email),
+                formatField(request.graduationdate),
+                formatField(request.phonenumber),
+                formatField(request.selectedcollege),
+                formatField(request.emailaddress),
                 formatField(request.quantity),
                 formatField(request.totalamount),
                 formatField(request.purpose)
@@ -402,7 +402,7 @@ const Request = () => {
                                 <tr key={request.id} onClick={() => handleRowClick(request)} className="table-row-clickable">
                                     <td className='Sname'>{request.lastname}</td>
                                     <td className='Sname'>{request.firstname}</td>
-                                    <td>{request.datesubmitted}</td>
+                                    <td>{request.daterequested}</td>
                                     <td>{request.degreeprogram}</td>
                                     <td>{request.documenttype}</td>
                                     <td><span className={`status-tag ${request.status?.toLowerCase().replace(/\s/g, '')}`}>{request.status}</span></td>
@@ -448,10 +448,10 @@ const Request = () => {
                         <div className="form-grid">
                             <div className="form-field"><label>Course:</label><input type="text" value={selectedRequest.degreeprogram} readOnly className="modal-input" /></div>
                             <div className="form-field"><label>Year Started:</label><input type="text" value={selectedRequest.ayadmitted} readOnly className="modal-input" /></div>
-                            <div className="form-field"><label>Year Ended:</label><input type="text" value={selectedRequest.yearEnded} readOnly className="modal-input" /></div>
-                            <div className="form-field"><label>Phone Number:</label><input type="text" value={selectedRequest.phoneNumber} readOnly className="modal-input" /></div>
-                            <div className="form-field"><label>Landline:</label><input type="text" value={selectedRequest.landline} readOnly className="modal-input" /></div>
-                            <div className="form-field full-width"><label>Email Address:</label><input type="text" value={selectedRequest.email} readOnly className="modal-input" /></div>
+                            <div className="form-field"><label>Year Ended:</label><input type="text" value={selectedRequest.graduationdate} readOnly className="modal-input" /></div>
+                            <div className="form-field"><label>Phone Number:</label><input type="text" value={selectedRequest.phonenumber} readOnly className="modal-input" /></div>
+                            <div className="form-field college"><label>College:</label><input type="text" value={selectedRequest.selectedcollege} readOnly className="modal-input" /></div>
+                            <div className="form-field full-width"><label>Email Address:</label><input type="text" value={selectedRequest.emailaddress} readOnly className="modal-input" /></div>
                             <div className="form-field full-width"><label>Date of Request:</label><input type="text" value={selectedRequest.datesubmitted} readOnly className="modal-input" /></div>
                         </div>
 

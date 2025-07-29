@@ -66,7 +66,25 @@ app.get('/api/requests', async (req, res) => {
     let baseQuery = `
       SELECT * FROM (
         SELECT 
-          r.*,
+          r.id,
+          r.formrequestid,
+          r.studentnumber,
+          r.firstname,
+          r.lastname,
+          r.middlename,
+          r.degreeprogram,
+          r.ayadmitted,
+          r.documenttype,
+          r.quantity,
+          r.attachmentfile,
+          r.totalamount,
+          r.ornumber,
+          r.phonenumber,
+          r.emailaddress,
+          r.datesubmitted::DATE AS datesubmitted,
+          r.daterequested::DATE AS daterequested,
+          r.graduationdate::DATE AS graduationdate,
+          r.selectedcollege,
           CASE 
             WHEN r.ornumber IS NULL OR TRIM(r.ornumber) = '' THEN 'UNPAID'
             WHEN s.shelfstatus IS NULL THEN 'PROCESSING'
@@ -81,27 +99,27 @@ app.get('/api/requests', async (req, res) => {
     const values = [];
 
     if (lastname && lastname.trim() !== '') {
-      conditions.push(`lastname ILIKE $${values.length + 1}`);
+      conditions.push(`subquery.lastname ILIKE $${values.length + 1}`);
       values.push(`%${lastname}%`);
     }
     if (firstname && firstname.trim() !== '') {
-      conditions.push(`firstname ILIKE $${values.length + 1}`);
+      conditions.push(`subquery.firstname ILIKE $${values.length + 1}`);
       values.push(`%${firstname}%`);
     }
     if (datesubmitted && datesubmitted.trim() !== '') {
-      conditions.push(`datesubmitted = $${values.length + 1}`);
+      conditions.push(`subquery.datesubmitted = $${values.length + 1}`);
       values.push(datesubmitted);
     }
     if (degreeprogram && degreeprogram.trim() !== '') {
-      conditions.push(`degreeprogram ILIKE $${values.length + 1}`);
+      conditions.push(`subquery.degreeprogram ILIKE $${values.length + 1}`);
       values.push(`%${degreeprogram}%`);
     }
     if (documenttype && documenttype.trim() !== '') {
-      conditions.push(`documenttype ILIKE $${values.length + 1}`);
+      conditions.push(`subquery.documenttype ILIKE $${values.length + 1}`);
       values.push(`%${documenttype}%`);
     }
     if (status && status.trim() !== '') {
-      conditions.push(`status ILIKE $${values.length + 1}`);
+      conditions.push(`subquery.status ILIKE $${values.length + 1}`);
       values.push(`%${status}%`);
     }
 
@@ -109,7 +127,7 @@ app.get('/api/requests', async (req, res) => {
       baseQuery += ' WHERE ' + conditions.join(' AND ');
     }
 
-    baseQuery += ' ORDER BY datesubmitted DESC';
+    baseQuery += ' ORDER BY subquery.datesubmitted DESC';
 
     const result = await pool.query(baseQuery, values);
     res.json(result.rows);
@@ -186,7 +204,67 @@ app.put('/api/update-status', async (req, res) => {
   }
 });
 
+//DASHBOARD 
+app.get('/api/dashboard', async (req, res) => {
+ try {
+    const result = await pool.query(`
+      SELECT
+        r.selectedcollege,
+        r.degreeprogram,
+        r.graduationdate,
+        ss.shelfstatus AS status
+      FROM outgoing.requests r
+      LEFT JOIN outgoing.shelfstatus ss ON r.id = ss.request_id
+    `);
 
+    const statusCounts = {
+      pending: 0,
+      processing: 0,
+      shelf: 0,
+    };
+
+    const graduateCounts = {};
+
+    result.rows.forEach(row => {
+      const { selectedcollege, graduationdate, status } = row;
+      const isGraduate = graduationdate !== null;
+
+      // Count status
+      if (status === 'Pending') statusCounts.pending++;
+      else if (status === 'Processing') statusCounts.processing++;
+      else if (status === 'Shelf') statusCounts.shelf++;
+
+      // Build per-college stats
+      if (!graduateCounts[selectedcollege]) {
+        graduateCounts[selectedcollege] = {
+          selectedcollege,
+          undergraduate: 0,
+          graduate: 0,
+          total: 0
+        };
+      }
+
+      if (isGraduate) {
+        graduateCounts[selectedcollege].graduate += 1;
+      } else {
+        graduateCounts[selectedcollege].undergraduate += 1;
+      }
+
+      graduateCounts[selectedcollege].total += 1;
+    });
+
+    const graduateCountsArray = Object.values(graduateCounts);
+
+    res.json({
+      statusCounts,
+      graduateCounts: graduateCountsArray
+    });
+
+  } catch (error) {
+    console.error('Dashboard query error:', error.message);
+    res.status(500).json({ error: 'Error fetching dashboard data' });
+  }
+});
 
 
 app.post('/upload', upload.single('file'), (req, res) => {

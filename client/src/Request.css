@@ -465,6 +465,10 @@
     grid-column: 1 / -1;
 }
 
+.form-field.college {
+    width: 30.5rem;
+}
+
 .document-request-section {
     padding: 15px 20px;
     background-color: #ffffff;
