@@ -88,9 +88,9 @@ app.get('/api/requests', async (req, res) => {
           r.ornumber,
           r.phonenumber,
           r.emailaddress,
-          r.datesubmitted::DATE AS datesubmitted,
-          r.daterequested::DATE AS daterequested,
-          r.graduationdate::DATE AS graduationdate,
+          TO_CHAR(r.datesubmitted, 'YYYY-MM-DD') AS datesubmitted,
+          TO_CHAR(r.daterequested, 'YYYY-MM-DD') AS daterequested,
+          TO_CHAR(r.graduationdate, 'YYYY-MM-DD') AS graduationdate,
           r.selectedcollege,
           CASE 
             WHEN r.ornumber IS NULL OR TRIM(r.ornumber) = '' THEN 'UNPAID'
@@ -137,7 +137,9 @@ app.get('/api/requests', async (req, res) => {
     baseQuery += ' ORDER BY subquery.datesubmitted DESC';
 
     const result = await pool.query(baseQuery, values);
-    res.json(result.rows);
+    res.json(result.rows); 
+
+  res.json(formattedRows);
   } catch (err) {
     console.error('Error fetching requests:', err.message);
     res.status(500).send('Server error');

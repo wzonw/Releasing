@@ -32,21 +32,33 @@ const Request = () => {
     const statusFilterDropdownRef = useRef(null);
     const statusModalDropdownRef = useRef(null);
 
-    const courseOptions = ['BSIT', 'BSCS', 'BSA', 'BSN', 'BSED'];
-    const documentTypeOptions = ['Transcript of Records', 'Good Moral Certificate', 'Diploma'];
-    const statusOptions = ['READY', 'PROCESSING', 'CLAIMED', 'UNPAID'];
+    const [courseOptions, setCourseOptions] = useState([]);
+    const [documentTypeOptions, setDocumentTypeOptions] = useState([]);
+    const [statusOptions, setStatusOptions] = useState([]);
+
 
     // Wrap fetchRequests in useCallback.
     // It now depends on 'search' because its internal logic uses the 'search' state.
     const fetchRequests = useCallback(async () => {
         try {
             const response = await axios.get('http://localhost:3001/api/requests');
-            const allRequests = response.data; // This is a local variable, not a state variable.
+            const allRequests = response.data;
 
+            // Extract dynamic values
+            const uniqueCourses = [...new Set(allRequests.map(r => r.degreeprogram))];
+            const uniqueDocumentTypes = [...new Set(allRequests.map(r => r.documenttype))];
+            const uniqueStatuses = [...new Set(allRequests.map(r => r.status))];
+
+            // Set them into state (you'll need to define them in useState)
+            setCourseOptions(uniqueCourses);
+            setDocumentTypeOptions(uniqueDocumentTypes);
+            setStatusOptions(uniqueStatuses);
+
+            // Continue with filtering...
             const newFilteredData = allRequests.filter(request => {
                 const matchesLastName = search.lastname === '' || request.lastname.toLowerCase().includes(search.lastname.toLowerCase());
                 const matchesFirstName = search.firstname === '' || request.firstname.toLowerCase().includes(search.firstname.toLowerCase());
-                const matchesDate = search.datesubmitted === '' || request.datesubmitted.includes(search.datesubmitted);
+                const matchesDate = search.datesubmitted === '' || request.daterequested.includes(search.datesubmitted);
                 const matchesDegreeProgram = search.degreeprogram.length === 0 || search.degreeprogram.includes(request.degreeprogram);
                 const matchesDocumentType = search.documenttype.length === 0 || search.documenttype.includes(request.documenttype);
                 const matchesStatus = search.status.length === 0 || search.status.includes(request.status);
@@ -56,11 +68,10 @@ const Request = () => {
 
             setFilteredData(newFilteredData);
             setCurrentPage(1);
-            console.log('Fetched and filtered requests:', newFilteredData);
         } catch (error) {
             console.error('Error fetching requests:', error);
         }
-    }, [search]); // Dependency array for useCallback: fetchRequests depends on 'search'
+    }, [search]);
 
     // The useEffect now correctly depends on fetchRequests.
     // Since fetchRequests is memoized by useCallback, this won't cause infinite loops.
