@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import './login.css';
 
 function Login() {
-
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      // --- CHANGE THIS LINE ---
+      const response = await fetch('http://localhost:3001/api/login', { // Changed from 5000 to 3001
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,7 +30,6 @@ function Login() {
     }
   };
 
-  
   return (
     <div className="login-container">
       {/* Header */}
