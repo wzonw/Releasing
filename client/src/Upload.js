@@ -77,7 +77,7 @@ sheets.forEach(sheet => {
 
   // Object-based version for saving to DB
   const objectData = XLSX.utils.sheet_to_json(worksheet, {
-    range: 13, // Row 14
+    range: 16, // Row 17
     defval: ''
   });
 

@@ -5,7 +5,6 @@ const path = require('path');
 const fs = require('fs');
 const pool = require('./db');
 require('dotenv').config();
-
 const app = express();
 const host = '0.0.0.0';
 const port = 3001;
@@ -92,6 +91,7 @@ app.get('/api/requests', async (req, res) => {
           TO_CHAR(r.daterequested, 'YYYY-MM-DD') AS daterequested,
           TO_CHAR(r.graduationdate, 'YYYY-MM-DD') AS graduationdate,
           r.selectedcollege,
+          r.originalreceipt,
           CASE 
             WHEN r.ornumber IS NULL OR TRIM(r.ornumber) = '' THEN 'UNPAID'
             WHEN s.shelfstatus IS NULL THEN 'PROCESSING'
@@ -138,8 +138,6 @@ app.get('/api/requests', async (req, res) => {
 
     const result = await pool.query(baseQuery, values);
     res.json(result.rows); 
-
-  res.json(formattedRows);
   } catch (err) {
     console.error('Error fetching requests:', err.message);
     res.status(500).send('Server error');
@@ -149,66 +147,64 @@ app.get('/api/requests', async (req, res) => {
 // Bulk verification and update
 app.post('/verify-data', async (req, res) => {
   const { data } = req.body;
-  const updatedby = 'System'; // Change this to your actual username logic
+  const updatedby = 'System';
 
   try {
     const verificationResults = [];
 
-    for (const row of data) {
-      console.log("Row being processed:", row);
+    // Step 1: Count duplicates in Excel
+    const requestCounts = {};
 
-      // Normalize keys by lowercasing and trimming
-      const rowKeys = Object.keys(row).reduce((acc, key) => {
+    for (const row of data) {
+      const keys = Object.keys(row).reduce((acc, key) => {
         acc[key.trim().toLowerCase()] = row[key];
         return acc;
       }, {});
 
-      const lastName = rowKeys["last name"];
-      const firstName = rowKeys["first name"];
-      const documents = rowKeys["documents"];
+      const key = `${keys["first name"]?.trim().toLowerCase()}|${keys["last name"]?.trim().toLowerCase()}|${keys["documents"]?.trim().toLowerCase()}`;
+      if (!requestCounts[key]) requestCounts[key] = 0;
+      requestCounts[key]++;
+    }
 
-      console.log(`Checking: ${firstName} ${lastName} - ${documents}`);
+    // Step 2: For each unique entry, update oldest matching rows
+    for (const combo in requestCounts) {
+      const [firstName, lastName, documents] = combo.split("|");
+      const count = requestCounts[combo];
 
-      if (!lastName || !firstName || !documents) {
+      const result = await pool.query(
+        `SELECT id, datesubmitted FROM outgoing.requests
+         WHERE firstname ILIKE $1 AND lastname ILIKE $2 AND documenttype ILIKE $3
+         ORDER BY datesubmitted ASC`,
+        [firstName, lastName, documents]
+      );
+
+      const matchingRequests = result.rows.slice(0, count); // Get only N oldest
+
+      if (matchingRequests.length === 0) {
         verificationResults.push({
-          name: `${firstName ?? 'N/A'} ${lastName ?? 'N/A'}`,
-          document: documents ?? 'N/A',
+          name: `${firstName} ${lastName}`,
+          document: documents,
           updated: false,
-          error: 'Missing data'
+          error: 'Request not found'
         });
         continue;
       }
 
-      const result = await pool.query(
-        `SELECT id FROM outgoing.requests
-         WHERE lastname ILIKE $1 AND firstname ILIKE $2 AND documenttype ILIKE $3`,
-        [lastName, firstName, documents]
-      );
-
-      if (result.rows.length > 0) {
-        const requestId = result.rows[0].id;
-
+      for (const request of matchingRequests) {
         await pool.query(
           `INSERT INTO outgoing.shelfstatus (request_id, shelfstatus, updatedby, updatedat)
-           VALUES ($1, $2, $3, NOW())
+           VALUES ($1, 'READY', $2, NOW())
            ON CONFLICT (request_id) DO UPDATE SET
              shelfstatus = EXCLUDED.shelfstatus,
              updatedby = EXCLUDED.updatedby,
              updatedat = NOW()`,
-          [requestId, 'READY', updatedby]
+          [request.id, updatedby]
         );
 
         verificationResults.push({
           name: `${firstName} ${lastName}`,
           document: documents,
           updated: true
-        });
-      } else {
-        verificationResults.push({
-          name: `${firstName} ${lastName}`,
-          document: documents,
-          updated: false,
-          error: 'Request not found'
         });
       }
     }
@@ -221,6 +217,7 @@ app.post('/verify-data', async (req, res) => {
 });
 
 
+
 // Manual status update
 app.put('/api/update-status', async (req, res) => {
   try {
@@ -231,8 +228,12 @@ app.put('/api/update-status', async (req, res) => {
     }
 
     await pool.query(
-      `INSERT INTO shelfstatus (request_id, shelfstatus, updatedby, updatedat)
-       VALUES ($1, $2, $3, NOW())`,
+      `INSERT INTO outgoing.shelfstatus (request_id, shelfstatus, updatedby, updatedat)
+      VALUES ($1, $2, $3, NOW())
+      ON CONFLICT (request_id) DO UPDATE SET
+        shelfstatus = EXCLUDED.shelfstatus,
+        updatedby = EXCLUDED.updatedby,
+        updatedat = NOW()`,
       [request_id, shelfstatus, updatedby]
     );
 

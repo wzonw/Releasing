@@ -140,7 +140,11 @@
 
 .tabs a {
     text-decoration: none; 
-    color: inherit;         
+    color: inherit;       
+}
+
+.modal-input{
+    color: #14409F;
 }
 
 .account-dropdown {

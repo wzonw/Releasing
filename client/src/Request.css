@@ -4,9 +4,10 @@
 
 .container {
     font-family: Arial, sans-serif;
-    margin-top: 5rem;
+    margin-top: 0rem;
     padding: 1rem;
     font-size: small;
+    overflow: hidden;
 }
 
 .top-actions-bar-right {
@@ -18,7 +19,6 @@
     position: sticky;
     top: 0;
     background-color: #f0f2f5;
-    z-index: 1000;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     flex-wrap: wrap;
     gap: 15px;
@@ -255,7 +255,7 @@
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
-    margin-top: 1rem;
+    margin-top: 10px;
 }
 
 .document-table th {
@@ -275,27 +275,58 @@
     border-bottom: 1px solid #ccc;
     font-weight: bolder;
 }
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 15px;
-    gap: 12px;
+.custom-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0 0 6px 6px;
 }
 
-.pagination button {
-    padding: 6px 12px;
+.custom-pagination button {
+  background-color: transparent;
+  border: none;
+  color: rgb(0, 0, 0);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: transform 0.2s;
+}
+
+.custom-pagination .page-btn {
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.custom-pagination .page-btn.active {
     border: none;
-    background-color: #333;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
+    border-bottom: 3px solid #0077c2;
+    background-color: transparent;
+    color: #0077c2;
+    font-weight: bold;
 }
 
-.pagination button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+.custom-pagination .page-btn:hover{
+    border: none;
+    border-bottom: 3px solid #ceca00;
+    background-color: transparent;
+    color: #ceca00;
+    font-weight: bold;
 }
+
+.custom-pagination .dots {
+  color: rgb(0, 0, 0);
+  padding: 0 0.3rem;
+  font-size: 1.2rem;
+}
+
+.custom-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 
 .status-tag {
     padding: 0.3rem 0.8rem;
@@ -350,6 +381,8 @@
 .modal-content-new {
     background-color: #f0f2f5;
     padding: 20px;
+    margin-top: 5rem;
+    outline-color: greenyellow;
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
     width: 90%;
@@ -359,7 +392,7 @@
     flex-direction: column;
     gap: 15px;
     border: 1px solid #e0e0e0;
-    max-height: 90vh;
+    max-height: 15cm;
     overflow-y: auto;
 }
 

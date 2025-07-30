@@ -3,7 +3,7 @@ import Header from './Header';
 import axios from 'axios';
 import './Request.css';
 
-const Request = () => {
+function Request() {
     const [search, setSearch] = useState({
         lastname: '',
         firstname: '',
@@ -73,7 +73,12 @@ const Request = () => {
         }
     }, [search]);
 
-    // The useEffect now correctly depends on fetchRequests.
+    // Request.jsx
+
+    const resolveRemotePdf = (urlFromDb) => {
+        return urlFromDb.replace('localhost', '192.168.55.120'); // Replace IP
+    };
+
     // Since fetchRequests is memoized by useCallback, this won't cause infinite loops.
     useEffect(() => {
         fetchRequests();
@@ -151,6 +156,8 @@ const Request = () => {
     const endIndex = startIndex + itemsPerPage;
     const paginatedData = filteredData.slice(startIndex, endIndex);
 
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
     const handleRowClick = (request) => {
         setSelectedRequest(request);
         setIsModalOpen(true);
@@ -164,7 +171,7 @@ const Request = () => {
 
     const handleStatusChange = async (requestId, newStatus) => {
         try {
-            const updatedby = "Trisha Ann";
+            const updatedby = "System"; //Enhance for per account update
 
             const response = await fetch("http://localhost:3001/api/update-status", {
                 method: "PUT",
@@ -221,6 +228,7 @@ const Request = () => {
                 formatField(request.graduationdate),
                 formatField(request.phonenumber),
                 formatField(request.selectedcollege),
+                formatField(request.originalreceipt),
                 formatField(request.emailaddress),
                 formatField(request.quantity),
                 formatField(request.totalamount),
@@ -252,11 +260,11 @@ const Request = () => {
             <div><Header /></div>
             <div className='container'>
                 <div className='body'>
-                    <div className="top-actions-bar-right">
-                        <button className="download-list-button" onClick={handleDownloadList}>
-                            Download
-                        </button>
-                    </div>
+                    {/* <div className="top-actions-bar-right"> */}
+                        {/* <button className="download-list-button" onClick={handleDownloadList}> */}
+                            {/* Download */}
+                        {/* </button> */}
+                    {/* </div> */}
 
                     <div className="filter-bar">
                         <div className="filter-input-wrapper">
@@ -392,8 +400,8 @@ const Request = () => {
                                 </div>
                             )}
                         </div>
-                        <button className="search-request-button" onClick={fetchRequests}>
-                            Search
+                        <button className="download-list-button" onClick={handleDownloadList}>
+                            Download
                         </button>
                     </div>
 
@@ -421,33 +429,53 @@ const Request = () => {
                             ))}
                         </tbody>
                     </table>
-
-                    <div className="pagination">
-                        <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
-                            Previous
-                        </button>
-                        <span>Page {currentPage} of {Math.ceil(filteredData.length / itemsPerPage)}</span>
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredData.length / itemsPerPage)))}
-                            disabled={currentPage >= Math.ceil(filteredData.length / itemsPerPage)}
-                        >
-                            Next
-                        </button>
+                    <div className="custom-pagination">
+                      <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>&lt;</button>
+                                            
+                      {[...Array(totalPages)].map((_, index) => {
+                        const page = index + 1;
+                        const isFirst = page === 1;
+                        const isLast = page === totalPages;
+                        const isNearCurrent = Math.abs(page - currentPage) <= 1;
+                    
+                        if (isFirst || isLast || isNearCurrent) {
+                          return (
+                            <button
+                              key={page}
+                              className={currentPage === page ? 'page-btn active' : 'page-btn'}
+                              onClick={() => setCurrentPage(page)}
+                            >
+                              {page}
+                            </button>
+                          );
+                        }
+                    
+                        if (
+                          (page === 2 && currentPage > 4) ||
+                          (page === totalPages - 1 && currentPage < totalPages - 3) ||
+                          Math.abs(page - currentPage) === 2
+                        ) {
+                          return <span key={page} className="dots">...</span>;
+                        }
+                        return null;
+                      })}
+                    
+                      <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>&gt;</button>
                     </div>
+                  
                 </div>
             </div>
 
             {isModalOpen && selectedRequest && (
                 <div className="modal-overlay">
                     <div className="modal-content-new">
-                        <div className="modal-header-new">
+                        {/* <div className="modal-header-new">
                             <span className="request-information-text">Request Information</span>
                             <div className="modal-header-right">
                                 <span className={`status-tag ${selectedRequest.status?.toLowerCase().replace(/\s/g, '')}`}>{selectedRequest.status}</span>
                                 <span className="reference-number">[{selectedRequest.formrequestid}]</span>
                             </div>
-                        </div>
-
+                        </div> */}
                         <div className="student-info-section">
                             <div className="student-name-number">
                                 <span className="student-name">{selectedRequest.lastname}, {selectedRequest.firstname}</span>
@@ -462,7 +490,19 @@ const Request = () => {
                             <div className="form-field"><label>Year Ended:</label><input type="text" value={selectedRequest.graduationdate} readOnly className="modal-input" /></div>
                             <div className="form-field"><label>Phone Number:</label><input type="text" value={selectedRequest.phonenumber} readOnly className="modal-input" /></div>
                             <div className="form-field college"><label>College:</label><input type="text" value={selectedRequest.selectedcollege} readOnly className="modal-input" /></div>
-                            <div className="form-field full-width"><label>Email Address:</label><input type="text" value={selectedRequest.emailaddress} readOnly className="modal-input" /></div>
+                            <div className="form-field full-width">
+                                <label>Receipt:</label>
+                                {selectedRequest.originalreceipt ? (
+                                    <a
+                                    href={resolveRemotePdf(selectedRequest.originalreceipt)}
+                                    target="_blank" rel="noopener noreferrer" className="modal-input"
+                                    >
+                                    View Receipt
+                                    </a>
+                                ) : (
+                                    <input type="text" value="No receipt uploaded" readOnly className="modal-input" />
+                                )}
+                            </div>                            <div className="form-field full-width"><label>Email Address:</label><input type="text" value={selectedRequest.emailaddress} readOnly className="modal-input" /></div>
                             <div className="form-field full-width"><label>Date of Request:</label><input type="text" value={selectedRequest.datesubmitted} readOnly className="modal-input" /></div>
                         </div>
 
