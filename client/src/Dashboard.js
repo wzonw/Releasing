@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './Dashboard.css';
+import axios from 'axios';
 import Header from './Header';
 import { BarChart } from '@mui/x-charts/BarChart';
 import Table from '@mui/material/Table';
@@ -13,38 +14,52 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-const type = ['Pending', 'Processing', 'Shelf', 'Released', 'Total Requests'];
-const val = [123, 312, 123, 321, 1000];
-const barColors = ['#1d4ed8', '#22c55e', '#f59e42', '#e11d48', '#a21caf'];
-
 function Dashboard() {
-  const [stackedMode, setStackedMode] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+const [collegeData, setCollegeData] = useState({});
+const [statusSummary, setStatusSummary] = useState({
+  Processing: 0,
+  Ready: 0,
+  Claimed: 0,
+  Total: 0
+});
+const [stackedMode, setStackedMode] = useState(false);
+const [selectedDate, setSelectedDate] = useState(new Date());
+const type = ['Processing', 'Ready', 'Claimed', 'Total'];
+const val = [
+  statusSummary.Processing,
+  statusSummary.Ready,
+  statusSummary.Claimed,
+  statusSummary.Total
+];
+const barColors = ['#1d4ed8', '#22c55e', '#a21caf', '#f59e42'];
 
-  function createData(name, Undergraduates, Graduates, Total) {
-    return { name, Undergraduates, Graduates, Total };
-  }
 
-  const rows = [
-    createData('CET', 159, 60, 219),
-    createData('CISTM', 237, 90, 327),
-    createData('CN', 262, 160, 422),
-    createData('CTHM', 305, 37, 342),
-    createData('Gingerbread', 356, 160, 516),
-    createData('Kopiko', 237, 90, 327),
-    createData('Fyang Coco Martin', 262, 160, 422),
-    createData('Cupcake', 305, 37, 342),
-    createData('CTHM', 305, 37, 342),
-    createData('Gingerbread', 356, 160, 516),
-    createData('Kopiko', 237, 90, 327),
-    createData('Fyang Coco Martin', 262, 160, 422),
-    createData('Cupcake', 305, 37, 342),
-  ];
+useEffect(() => {
+  axios.get('/api/status-summary')
+    .then(res => setStatusSummary(res.data))
+    .catch(err => console.error('Fetch failed:', err));
+}, []);
 
-  const collegeLabels = ['CASBE', 'CHASS', 'CS', 'CISTM', 'CN', 'LAW', 'CET', 'BSA', 'CPT', 'CED', 'SOG', 'CBA'];
-  const requestSubmitted = [40, 70, 50, 40, 90, 60, 40, 70, 80, 60, 50, 45];
-  const documentsReleased = [30, 60, 20, 30, 60, 40, 20, 60, 100, 80, 60, 55];
-  const backlog = [20, 40, 10, 10, 50, 30, 30, 40, 60, 20, 45, 35];
+useEffect(() => {
+  axios.get('/api/status-by-college')
+    .then(res => setCollegeData(res.data))
+    .catch(err => console.error('College status fetch failed:', err));
+}, []);
+
+function createData(name, total) {
+  return { name, total };
+}
+
+const rows = [];
+const collegeLabels = Object.keys(collegeData);
+collegeLabels.forEach(college => {
+  const data = collegeData[college] || {};
+  const total = data.Total || 0;
+  rows.push(createData(college, total));
+});
+rows.sort((a, b) => a.name.localeCompare(b.name));
+const requestSubmitted = collegeLabels.map(college => collegeData[college]?.Ready || 0);
+const documentsReleased = collegeLabels.map(college => collegeData[college]?.Claimed || 0);
 
   return (
     <div className=" ">
@@ -64,11 +79,10 @@ function Dashboard() {
               <div className="overview-left">
                 <h2>Document Overview</h2>
                 <p className="total-label">Total Requests</p>
-                <h1 className="total-count">950</h1>
+                <h1 className="total-count">{statusSummary.Total}</h1>
                 <div className="breakdown">
-                  <p>Pending <span>210</span></p>
-                  <p>Processing <span>135</span></p>
-                  <p>Shelf <span>240</span></p>
+                  <p>Processing <span>{statusSummary.Processing}</span></p>
+                  <p>Ready <span>{statusSummary.Ready}</span></p>
                 </div>
               </div>
 
@@ -80,7 +94,7 @@ function Dashboard() {
                       value={selectedDate}
                       onChange={(newDate) => setSelectedDate(newDate)}
                       minDate={new Date('2024-01-01')}
-                      maxDate={new Date('2025-12-31')}
+                      maxDate={new Date('2050-12-31')}
                       slotProps={{ textField: { size: 'small' } }}
                     />
                   </LocalizationProvider>
@@ -120,10 +134,8 @@ function Dashboard() {
                 className='docs'
                 xAxis={[{ data: collegeLabels, scaleType: 'band' }]}
                 series={[
-                  { data: requestSubmitted, label: 'Shelf', stack: 'A' },
-                  { data: documentsReleased, label: 'Documents Released', stack: 'A' },
-                  { data: backlog, label: 'Pending', stack: 'A' }
-                ]}
+                  { data: requestSubmitted, label: 'Ready', stack: 'A' },
+                  { data: documentsReleased, label: 'Documents Claimed', stack: 'A' },                ]}
                 height={350}
               />
             )}
@@ -134,9 +146,7 @@ function Dashboard() {
               <Table sx={{ minWidth: 0 }} aria-label="summary table">
                 <TableHead>
                   <TableRow>
-                    <TableCell className='table-header'>Dessert</TableCell>
-                    <TableCell className='table-header' align="center">Undergraduates</TableCell>
-                    <TableCell className='table-header' align="center">Graduates</TableCell>
+                    <TableCell className='table-header'>Colleges</TableCell>
                     <TableCell className='table-header' align="center">Total</TableCell>
                   </TableRow>
                 </TableHead>
@@ -144,9 +154,7 @@ function Dashboard() {
                   {rows.map((row) => (
                     <TableRow key={row.name}>
                       <TableCell>{row.name}</TableCell>
-                      <TableCell align="center">{row.Undergraduates}</TableCell>
-                      <TableCell align="center">{row.Graduates}</TableCell>
-                      <TableCell align="center">{row.Total}</TableCell>
+                      <TableCell align="center">{row.total}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

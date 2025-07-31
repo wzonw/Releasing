@@ -144,6 +144,86 @@ app.get('/api/requests', async (req, res) => {
   }
 });
 
+// Fetch monitoring data with filters
+app.get('/api/monitoring', async (req, res) => {
+  try {
+    const { lastname, firstname, datesubmitted, degreeprogram, documenttype, status } = req.query;
+
+    let baseQuery = `
+      SELECT * FROM (
+        SELECT 
+          r.id,
+          r.formrequestid,
+          r.studentnumber,
+          r.firstname,
+          r.lastname,
+          r.middlename,
+          r.degreeprogram,
+          r.ayadmitted,
+          r.documenttype,
+          r.quantity,
+          r.attachmentfile,
+          r.totalamount,
+          r.ornumber,
+          r.phonenumber,
+          r.emailaddress,
+          TO_CHAR(r.datesubmitted, 'YYYY-MM-DD') AS datesubmitted,
+          TO_CHAR(r.daterequested, 'YYYY-MM-DD') AS daterequested,
+          TO_CHAR(r.graduationdate, 'YYYY-MM-DD') AS graduationdate,
+          r.selectedcollege,
+          r.originalreceipt,
+          CASE 
+            WHEN r.ornumber IS NULL OR TRIM(r.ornumber) = '' THEN 'UNPAID'
+            WHEN s.shelfstatus IS NULL THEN 'PROCESSING'
+            ELSE s.shelfstatus
+          END AS status
+        FROM outgoing.requests r
+        LEFT JOIN outgoing.shelfstatus s ON r.id = s.request_id
+      ) AS subquery
+    `;
+
+    const conditions = [];
+    const values = [];
+
+    if (lastname && lastname.trim() !== '') {
+      conditions.push(`subquery.lastname ILIKE $${values.length + 1}`);
+      values.push(`%${lastname}%`);
+    }
+    if (firstname && firstname.trim() !== '') {
+      conditions.push(`subquery.firstname ILIKE $${values.length + 1}`);
+      values.push(`%${firstname}%`);
+    }
+    if (datesubmitted && datesubmitted.trim() !== '') {
+      conditions.push(`subquery.datesubmitted = $${values.length + 1}`);
+      values.push(datesubmitted);
+    }
+    if (degreeprogram && degreeprogram.trim() !== '') {
+      conditions.push(`subquery.degreeprogram ILIKE $${values.length + 1}`);
+      values.push(`%${degreeprogram}%`);
+    }
+    if (documenttype && documenttype.trim() !== '') {
+      conditions.push(`subquery.documenttype ILIKE $${values.length + 1}`);
+      values.push(`%${documenttype}%`);
+    }
+    if (status && status.trim() !== '') {
+      conditions.push(`subquery.status ILIKE $${values.length + 1}`);
+      values.push(`%${status}%`);
+    }
+
+    if (conditions.length > 0) {
+      baseQuery += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    baseQuery += ' ORDER BY subquery.datesubmitted DESC';
+
+    const result = await pool.query(baseQuery, values);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching monitoring data:', err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 // Bulk verification and update
 app.post('/verify-data', async (req, res) => {
   const { data } = req.body;
@@ -216,8 +296,6 @@ app.post('/verify-data', async (req, res) => {
   }
 });
 
-
-
 // Manual status update
 app.put('/api/update-status', async (req, res) => {
   try {
@@ -244,65 +322,74 @@ app.put('/api/update-status', async (req, res) => {
   }
 });
 
-// Dashboard data
-app.get('/api/dashboard', async (req, res) => {
+//STATUS SUMMARY SA DASHBOARDno dein
+app.get('/api/status-summary', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT
-        r.selectedcollege,
-        r.degreeprogram,
-        r.graduationdate,
-        ss.shelfstatus AS status
-      FROM outgoing.requests r
-      LEFT JOIN outgoing.shelfstatus ss ON r.id = ss.request_id
+      SELECT shelfstatus, COUNT(*) AS count
+      FROM outgoing.shelfstatus
+      GROUP BY shelfstatus
     `);
 
-    const statusCounts = {
-      pending: 0,
-      processing: 0,
-      shelf: 0,
+    const summary = {
+      Pending: 0,
+      Processing: 0,
+      Ready: 0,
+      Claimed: 0,
+      Total: 0
     };
 
-    const graduateCounts = {};
+    let total = 0;
 
     result.rows.forEach(row => {
-      const { selectedcollege, graduationdate, status } = row;
-      const isGraduate = graduationdate !== null;
+      const raw = row.shelfstatus?.trim().toLowerCase();
+      const count = parseInt(row.count);
 
-      if (status === 'Pending') statusCounts.pending++;
-      else if (status === 'Processing') statusCounts.processing++;
-      else if (status === 'Shelf') statusCounts.shelf++;
+      // Convert to frontend-expected key format
+      let formatted = '';
+      if (raw === 'pending') formatted = 'Pending';
+      else if (raw === 'processing') formatted = 'Processing';
+      else if (raw === 'ready') formatted = 'Ready';
+      else if (raw === 'claimed') formatted = 'Claimed';
 
-      if (!graduateCounts[selectedcollege]) {
-        graduateCounts[selectedcollege] = {
-          selectedcollege,
-          undergraduate: 0,
-          graduate: 0,
-          total: 0
-        };
+      if (formatted) {
+        summary[formatted] += count;
+        total += count;
       }
-
-      if (isGraduate) {
-        graduateCounts[selectedcollege].graduate += 1;
-      } else {
-        graduateCounts[selectedcollege].undergraduate += 1;
-      }
-
-      graduateCounts[selectedcollege].total += 1;
     });
 
-    const graduateCountsArray = Object.values(graduateCounts);
-
-    res.json({
-      statusCounts,
-      graduateCounts: graduateCountsArray
-    });
-
-  } catch (error) {
-    console.error('Dashboard query error:', error.message);
-    res.status(500).json({ error: 'Error fetching dashboard data' });
+    summary.Total = total;
+    res.json(summary);
+  } catch (err) {
+    console.error('Error in /api/status-summary:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+app.get('/api/status-by-college', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT r.selectedcollege, COUNT(*) AS total
+      FROM outgoing.requests r
+      GROUP BY r.selectedcollege
+      ORDER BY r.selectedcollege
+    `);
+
+    // Convert to an object: { "College A": { Total: X }, ... }
+    const summary = {};
+    result.rows.forEach(row => {
+      summary[row.selectedcollege] = {
+        Total: parseInt(row.total)
+      };
+    });
+
+    res.json(summary);
+  } catch (err) {
+    console.error('Error in /api/status-by-college:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 // File upload
 app.post('/upload', upload.single('file'), (req, res) => {
