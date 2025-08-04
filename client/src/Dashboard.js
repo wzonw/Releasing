@@ -19,7 +19,7 @@ const [collegeData, setCollegeData] = useState({});
 const [statusSummary, setStatusSummary] = useState({
   Processing: 0,
   Ready: 0,
-  Claimed: 0,
+
   Total: 0
 });
 const [stackedMode, setStackedMode] = useState(false);
@@ -41,10 +41,14 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  axios.get('/api/status-by-college')
+  const endpoint = stackedMode
+    ? '/api/status-by-college-detailed'
+    : '/api/status-by-college';
+
+  axios.get(endpoint)
     .then(res => setCollegeData(res.data))
     .catch(err => console.error('College status fetch failed:', err));
-}, []);
+}, [stackedMode]);
 
 function createData(name, total) {
   return { name, total };
@@ -58,8 +62,9 @@ collegeLabels.forEach(college => {
   rows.push(createData(college, total));
 });
 rows.sort((a, b) => a.name.localeCompare(b.name));
-const requestSubmitted = collegeLabels.map(college => collegeData[college]?.Ready || 0);
-const documentsReleased = collegeLabels.map(college => collegeData[college]?.Claimed || 0);
+const requestProcessing = collegeLabels.map(college => collegeData[college]?.Processing || 0);
+const requestReady = collegeLabels.map(college => collegeData[college]?.Ready || 0);
+const requestClaimed = collegeLabels.map(college => collegeData[college]?.Claimed || 0);
 
   return (
     <div className=" ">
@@ -134,8 +139,10 @@ const documentsReleased = collegeLabels.map(college => collegeData[college]?.Cla
                 className='docs'
                 xAxis={[{ data: collegeLabels, scaleType: 'band' }]}
                 series={[
-                  { data: requestSubmitted, label: 'Ready', stack: 'A' },
-                  { data: documentsReleased, label: 'Documents Claimed', stack: 'A' },                ]}
+                  { data: requestProcessing, label: 'Processing', stack: 'A', color: '#1d4ed8' },
+                  { data: requestReady, label: 'Ready', stack: 'A', color: '#22c55e' },
+                  { data: requestClaimed, label: 'Claimed', stack: 'A', color: '#a21caf' },
+                ]}
                 height={350}
               />
             )}

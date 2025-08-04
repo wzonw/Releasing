@@ -4,15 +4,13 @@ import './login.css';
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     try {
-      // --- CHANGE THIS LINE ---
-      const response = await fetch('http://localhost:3001/api/login', { // Changed from 5000 to 3001
+      const response = await fetch('http://localhost:3001/server/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
@@ -30,6 +28,20 @@ function Login() {
     }
   };
 
+  const today = new Date();
+  const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+  const formattedToday = today.toLocaleDateString('en-US', options);
+
+  // const formatDateTime = (date) =>
+    // date.toLocaleDateString('en-US', {
+      // month: 'long',
+      // day: 'numeric',
+      // year: 'numeric',
+      // hour: 'numeric',
+      // minute: '2-digit',
+      // hour12: true,
+    // });
+
   return (
     <div className="login-container">
       {/* Header */}
@@ -45,11 +57,28 @@ function Login() {
         {/* Login Form */}
         <div className="login-form">
           <h3>SIGN IN</h3>
-          <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)}/>
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <button className="login-btn" onClick={handleLogin}>
-            LOGIN
-          </button>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <label style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', fontSize: '14px' }}>
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={() => setShowPassword(prev => !prev)}
+              style={{ marginRight: '5px' }}
+            />
+            Show Password
+          </label>
+          <button className="login-btn" onClick={handleLogin}>LOGIN</button>
           <button
             type="button"
             className="help-btn"
@@ -63,16 +92,12 @@ function Login() {
         <div className="releasing-window">
           <h4>RELEASING WINDOW</h4>
           <p><strong>CATEGORY:</strong> Undergraduate - Graduating Students</p>
-          <p><strong>ACADEMIC YEAR:</strong> 2024 - 2025</p>
-          <p><strong>SEM:</strong> 2nd</p>
-          <p><strong>START DATE:</strong> <span className="highlight">May 19, 2025 1:00 AM</span></p>
-          <p><strong>END DATE:</strong> <span className="highlight">May 25, 2025 11:59 PM</span></p>
         </div>
       </div>
 
       {/* Footer */}
       <p className="login-footer">
-        Today is <strong>Wednesday, July 28, 2025</strong>
+        Today is <strong>{formattedToday}</strong>
       </p>
     </div>
   );

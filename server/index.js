@@ -390,23 +390,97 @@ app.get('/api/status-by-college', async (req, res) => {
   }
 });
 
+app.get('/api/status-by-college-detailed', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        r.selectedcollege,
+        COALESCE(s.shelfstatus, 'Processing') AS shelfstatus,
+        COUNT(*) AS count
+      FROM outgoing.requests r
+      LEFT JOIN outgoing.shelfstatus s ON r.id = s.request_id
+      GROUP BY r.selectedcollege, s.shelfstatus
+      ORDER BY r.selectedcollege
+    `);
+
+    const summary = {};
+
+    result.rows.forEach(row => {
+      const college = row.selectedcollege || 'Unspecified';
+      const status = row.shelfstatus?.trim().toLowerCase();
+      const count = parseInt(row.count);
+
+      if (!summary[college]) {
+        summary[college] = { Processing: 0, Ready: 0, Claimed: 0, Total: 0 };
+      }
+
+      if (status === 'processing') summary[college].Processing += count;
+      else if (status === 'ready') summary[college].Ready += count;
+      else if (status === 'claimed') summary[college].Claimed += count;
+
+      summary[college].Total += count;
+    });
+
+    res.json(summary);
+  } catch (err) {
+    console.error('Error in /api/status-by-college-detailed:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 
 // File upload
 app.post('/upload', upload.single('file'), (req, res) => {
   res.json({ message: 'File uploaded successfully', filePath: `/annex/${req.file.filename}` });
 });
 
-// Server test and login dummy routes
+// Server test
 app.get("/server/message", (req, res) => {
   res.json({ message: "It Works!" });
 });
 
-app.post('/server/login', (req, res) => {
+app.post('/server/login', async (req, res) => {
   const { username, password } = req.body;
-  res.json({ success: true, message: 'Login successful!' });
+
+  try {
+    const result = await pool.query(
+      'SELECT * FROM outgoing.role_access WHERE username = $1 AND password = $2',
+      [username, password]
+    );
+
+    if (result.rows.length > 0) {
+      res.json({ success: true });
+    } else {
+      res.json({ success: false, message: 'Invalid username or password' });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+
+//login dummy users 
+app.get('/api/users', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT username, fullname FROM outgoing.role_access');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Server start
 app.listen(port, host, () => {
   console.log(`Server running on http://${host}:${port}`);
+});
+
+//Delete pool when shuhtdown
+process.on('SIGINT', () => {
+  pool.end(() => {
+    console.log('PostgreSQL pool has ended');
+    process.exit(0);
+  });
 });
