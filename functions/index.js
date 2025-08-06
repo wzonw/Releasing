@@ -494,4 +494,6 @@ process.on('SIGINT', () => {
   });
 });
 
+      // "npm --prefix \"$RESOURCE_DIR\" run lint" for firebase.json lint to know proper errors
+
 exports.api = functions.https.onRequest(app);
