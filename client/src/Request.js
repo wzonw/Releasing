@@ -17,9 +17,9 @@ function Request() {
     const [showDocumentTypeDropdown, setShowDocumentTypeDropdown] = useState(false);
     const [showStatusFilterDropdown, setShowStatusFilterDropdown] = useState(false);
     const [showStatusDropdown, setShowStatusDropdown] = useState(false);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
+    const [requests, setRequests] = useState([]);
 
     // Removed the 'data' state as it was assigned but never used.
     // The 'allRequests' variable inside fetchRequests now serves its temporary purpose.
@@ -41,7 +41,7 @@ function Request() {
     // It now depends on 'search' because its internal logic uses the 'search' state.
     const fetchRequests = useCallback(async () => {
         try {
-            const response = await axios.get('http://localhost:3001/api/requests');
+            const response = await axios.get('https://releasing.onrender.com/api/requests');
             const allRequests = response.data;
 
             // Extract dynamic values
@@ -79,10 +79,16 @@ function Request() {
         return urlFromDb.replace('localhost', '192.168.55.120'); // Replace IP
     };
 
-    // Since fetchRequests is memoized by useCallback, this won't cause infinite loops.
     useEffect(() => {
-        fetchRequests();
-    }, [fetchRequests]);
+    fetch('https://releasing.onrender.com/api/requests')
+        .then(res => res.json())
+        .then(data => {
+        setRequests(data);  // ✅ updates UI
+        })
+        .catch(error => {
+        console.error('Error fetching requests:', error);
+        });
+    }, []);
 
     const handleSearchInputChange = (e) => {
         const { name, value } = e.target;
@@ -173,7 +179,7 @@ function Request() {
         try {
             const updatedby = "System"; //Enhance for per account update
 
-            const response = await fetch("http://localhost:3001/api/update-status", {
+            const response = await fetch("https://releasing.onrender.com/api/update-status", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

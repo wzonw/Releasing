@@ -10,7 +10,11 @@ const host = '0.0.0.0';
 const port = 3001;
 const UPLOADS_DIR = path.join(__dirname, 'public', 'annex');
 
-app.use(cors());
+app.use(cors({
+  origin: "https://docrequest-b5e22.web.app/", // exact domain of your frontend
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -428,8 +432,6 @@ app.get('/api/status-by-college-detailed', async (req, res) => {
   }
 });
 
-
-
 // File upload
 app.post('/upload', upload.single('file'), (req, res) => {
   res.json({ message: 'File uploaded successfully', filePath: `/annex/${req.file.filename}` });
@@ -459,7 +461,6 @@ app.post('/server/login', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
-
 
 //login dummy users 
 app.get('/api/users', async (req, res) => {

@@ -42,7 +42,7 @@ function Monitor() {
     // It now depends on 'search' because its internal logic uses the 'search' state.
     const fetchRequests = useCallback(async () => {
         try {
-            const response = await axios.get('http://localhost:3001/api/requests');
+            const response = await axios.get('https://releasing.onrender.com/api/requests');
             const allRequests = response.data;
 
             // Extract dynamic values
@@ -174,7 +174,7 @@ function Monitor() {
         try {
             const updatedby = "System"; //Enhance for per account update
 
-            const response = await fetch("http://localhost:3001/api/update-status", {
+            const response = await fetch("https://releasing.onrender.com/api/update-status", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

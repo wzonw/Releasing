@@ -35,15 +35,15 @@ const barColors = ['#1d4ed8', '#22c55e', '#a21caf', '#f59e42'];
 
 
 useEffect(() => {
-  axios.get('/api/status-summary')
+  axios.get('https://releasing.onrender.com/api/status-summary')
     .then(res => setStatusSummary(res.data))
     .catch(err => console.error('Fetch failed:', err));
 }, []);
 
 useEffect(() => {
   const endpoint = stackedMode
-    ? '/api/status-by-college-detailed'
-    : '/api/status-by-college';
+    ? 'https://releasing.onrender.com/api/status-by-college-detailed'
+    : 'https://releasing.onrender.com/api/status-by-college';
 
   axios.get(endpoint)
     .then(res => setCollegeData(res.data))

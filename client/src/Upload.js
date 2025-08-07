@@ -18,7 +18,7 @@ function Upload() {
 
 
   useEffect(() => {
-    fetch('http://localhost:3001/files')
+    fetch('https://releasing.onrender.com/files')
       .then(res => res.json())
       .then(data => setUploadedFiles(data))
       .catch(err => console.error('Failed to load files:', err));
@@ -38,7 +38,7 @@ const handleVerifyData = async () => {
   }
 
   try {
-    const response = await fetch("http://localhost:3001/verify-data", {
+    const response = await fetch("https://releasing.onrender.com/verify-data", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -63,7 +63,7 @@ const handleVerifyData = async () => {
   //File viewer for when clicking sa mga uploaded
 const handleFileClick = async (fileName) => {
     try {
-      const response = await fetch(`http://localhost:3001/annex/${fileName}`);
+      const response = await fetch(`https://releasing.onrender.com/annex/${fileName}`);
       const blob = await response.blob();
       const arrayBuffer = await blob.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: "array" });
@@ -115,7 +115,7 @@ setShowPreview(true);
   const handleDeleteConfirmed = () => {
     const fileName = fileToDelete.split('/').pop();
 
-    fetch(`http://localhost:3001/delete/${fileName}`, {
+    fetch(`https://releasing.onrender.com/delete/${fileName}`, {
       method: 'DELETE',
     })
       .then((res) => {
@@ -159,7 +159,7 @@ setShowPreview(true);
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:3001/upload", {
+      const response = await fetch("https://releasing.onrender.com/upload", {
         method: "POST",
         body: formData,
       });
