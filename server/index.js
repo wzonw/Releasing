@@ -11,7 +11,7 @@ const port = 3001;
 const UPLOADS_DIR = path.join(__dirname, 'public', 'annex');
 
 app.use(cors({
-  origin: "https://docrequest-b5e22.web.app/", // exact domain of your frontend
+  origin: "https://docrequest-b5e22.web.app", // exact domain of your frontend
 }));
 
 app.use(express.json());
