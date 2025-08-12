@@ -3,7 +3,14 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const pool = require('./db');
+const {Pool} = require('pg');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: true,
+  },
+});
+
 require('dotenv').config();
 const app = express();
 const host = '0.0.0.0';

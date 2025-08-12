@@ -37,7 +37,6 @@ function Request() {
     const [statusOptions, setStatusOptions] = useState([]);
 
 
-    // Wrap fetchRequests in useCallback.
     // It now depends on 'search' because its internal logic uses the 'search' state.
     const fetchRequests = useCallback(async () => {
         try {
@@ -73,22 +72,16 @@ function Request() {
         }
     }, [search]);
 
+    useEffect(() => {
+    fetchRequests();
+    }, [fetchRequests]);
+
+
     // Request.jsx
 
     const resolveRemotePdf = (urlFromDb) => {
         return urlFromDb.replace('localhost', '192.168.55.120'); // Replace IP
     };
-
-    useEffect(() => {
-    fetch('https://releasing.onrender.com/api/requests')
-        .then(res => res.json())
-        .then(data => {
-        setRequests(data);  // ✅ updates UI
-        })
-        .catch(error => {
-        console.error('Error fetching requests:', error);
-        });
-    }, []);
 
     const handleSearchInputChange = (e) => {
         const { name, value } = e.target;
