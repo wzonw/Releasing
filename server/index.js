@@ -3,12 +3,22 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const pool = require('./db');
+const {Pool} = require('pg');
+const pool = new Pool ({
+  connectionString: process.end.DATABASE_URL,
+  ssl:{
+    rejectUnauthorized: false,
+
+  }
+});
+
+
 require('dotenv').config();
 const app = express();
 const host = '0.0.0.0';
 const port = 3001;
 const UPLOADS_DIR = path.join(__dirname, 'public', 'annex');
+
 
 app.use(cors({
   origin: "https://docrequest-b5e22.web.app/", // exact domain of your frontend
@@ -37,7 +47,7 @@ app.get('/files', (req, res) => {
     if (err) {
       return res.status(500).json({ error: 'Unable to read files.' });
     }
-    const fileUrls = files.map(file => `http://localhost:3001/public/annex/${file}`);
+    const fileUrls = files.map(file => `/public/annex/${file}`);
     res.json(fileUrls);
   });
 });
