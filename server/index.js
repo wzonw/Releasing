@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const {Pool} = require('pg');
+<<<<<<< HEAD
 const pool = new Pool ({
   connectionString: process.end.DATABASE_URL,
   ssl:{
@@ -13,6 +14,15 @@ const pool = new Pool ({
 });
 
 
+=======
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: true,
+  },
+});
+
+>>>>>>> b41658b6fba42f74bcfe408b2a1a0721a872b697
 require('dotenv').config();
 const app = express();
 const host = '0.0.0.0';
