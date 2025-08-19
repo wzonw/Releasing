@@ -4,14 +4,12 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const {Pool} = require('pg');
-const pool = new Pool ({
+const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl:{
-    rejectUnauthorized: false,
-
-  }
+  ssl: {
+    rejectUnauthorized: true,
+  },
 });
-
 
 require('dotenv').config();
 const app = express();
@@ -19,9 +17,8 @@ const host = '0.0.0.0';
 const port = 3001;
 const UPLOADS_DIR = path.join(__dirname, 'public', 'annex');
 
-
 app.use(cors({
-  origin: "https://docrequest-b5e22.web.app", // exact domain of your frontend
+  origin: "https://docrequest-b5e22.web.app/", // exact domain of your frontend
 }));
 
 app.use(express.json());
@@ -47,7 +44,7 @@ app.get('/files', (req, res) => {
     if (err) {
       return res.status(500).json({ error: 'Unable to read files.' });
     }
-    const fileUrls = files.map(file => `/public/annex/${file}`);
+    const fileUrls = files.map(file => `http://localhost:3001/public/annex/${file}`);
     res.json(fileUrls);
   });
 });
