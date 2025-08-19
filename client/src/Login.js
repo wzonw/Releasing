@@ -17,7 +17,12 @@ function Login() {
       const data = await response.json();
 
       if (data.success) {
-        alert('Login successful!');
+          localStorage.setItem("user", JSON.stringify({
+          fullname: data.fullname,
+          role: data.role
+        }));
+      
+        alert(`Welcome, ${data.fullname}!`);
         window.location.href = "/dashboard";
       } else {
         alert('Login failed: ' + data.message);

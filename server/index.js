@@ -459,7 +459,10 @@ app.post('/server/login', async (req, res) => {
 
     if (result.rows.length > 0) {
       const user = result.rows[0];
-      res.json({ success: true, user });
+      res.json({ success: true, 
+            fullname: user.fullname,
+            username: user.username,
+       });
     } else {
       res.json({ success: false, message: 'Invalid username or password' });
     }
