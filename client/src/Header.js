@@ -6,6 +6,7 @@ import { MdAccountCircle, MdLogin } from "react-icons/md";
 function Header() {
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
+  const [user, setUser] = useState(null); 
 
   const toggleMenu = () => {
     setShowMenu(prev => !prev);
@@ -33,7 +34,7 @@ function Header() {
           <div className='emp'>
             <div className='emp-text'>
               <h1 className='emp-acc'>
-                Employee Name
+                {user ? user.fullname : "Employee Name"}
               </h1>
               <p className='desc'>
                 Clerk-in-Charge

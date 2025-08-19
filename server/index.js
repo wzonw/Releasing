@@ -18,7 +18,7 @@ const port = 3001;
 const UPLOADS_DIR = path.join(__dirname, 'public', 'annex');
 
 app.use(cors({
-  origin: "https://docrequest-b5e22.web.app/", // exact domain of your frontend
+  origin: "https://docrequest-b5e22.web.app", // exact domain of frontend
 }));
 
 app.use(express.json());
@@ -453,12 +453,13 @@ app.post('/server/login', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT * FROM outgoing.role_access WHERE username = $1 AND password = $2',
+      'SELECT username, fullname, role FROM outgoing.role_access WHERE username = $1 AND password = $2',
       [username, password]
     );
 
     if (result.rows.length > 0) {
-      res.json({ success: true });
+      const user = result.rows[0];
+      res.json({ success: true, user });
     } else {
       res.json({ success: false, message: 'Invalid username or password' });
     }
@@ -467,6 +468,7 @@ app.post('/server/login', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
 
 //login dummy users 
 app.get('/api/users', async (req, res) => {
