@@ -43,7 +43,7 @@ function Header() {
           <div className='emp'>
             <div className='emp-text'>
               <h1 className='emp-acc'>
-                {user ? `${user.firstname} ${user.lastname}` : "Employee Name"}
+                {user ? `${user.fullname}` : "Employee Name"}
               </h1>
               <p className='desc'>
                 Clerk-in-Charge
