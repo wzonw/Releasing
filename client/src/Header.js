@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import './Header.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { MdAccountCircle, MdLogin } from "react-icons/md";
@@ -7,6 +7,15 @@ function Header() {
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
   const [user, setUser] = useState(null); 
+  
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
 
   const toggleMenu = () => {
     setShowMenu(prev => !prev);
